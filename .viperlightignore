@@ -1,0 +1,6 @@
+package-lock.json
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+ipc-ai-saas-stack.ts
+build-ecr.sh
+THIRD-PARTY-LICENSES.txt
