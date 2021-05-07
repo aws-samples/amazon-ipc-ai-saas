@@ -1,12 +1,17 @@
-# Sagemaker Neo模型优化指南
+## Sagemaker Neo优化目标检测模型加速推理
 
 ### 目录
+* [摘要](#摘要)
 * [模型准备](#模型准备)
 * [Neo编译作业](#Neo编译作业)
 * [EC2推理速度测试](#EC2推理速度测试)
     * [启动EC2实例](#启动EC2实例)
     * [推理测试](#推理测试)
 
+### 摘要
+该文以目标检测模型着手，演示如何一步步基于Sagemaker Neo对训练后的模型文件进行编译优化，来提升模型的推理速度。
+文中以yolo3(backbone为mobilenet1.0）模型为例，分别演示模型准备，模型Neo编译，模型导出推理测试，可视化等过程，
+推理结果显示基于Sagemaker Neo可以显著提升推理速度，达到一倍以上的加速。
 
 ### 模型准备
 在利用Sagemaker Neo编译模型之前，首先需要根据神经网络的框架准备模型，具体可以参考官方指南
@@ -85,7 +90,6 @@ mkdir -p models/human_body_detector_neo
 cd models/human_body_detector_neo
 wget -c https://ipc-models-zoo.s3.amazonaws.com/body-detector/body_detector_yolo3_mobilenet1.0_coco-LINUX_X86_64_NVIDIA.tar.gz
 tar -zxvf body_detector_yolo3_mobilenet1.0_coco-LINUX_X86_64_NVIDIA.tar.gz
-
 ```
 上述命令执行之后，在`neo/`目录下的结构如下所示：
 ```
@@ -120,7 +124,17 @@ python3 eval.py
 
 运行结果会直接打印在terminal之上，同时也会将推理的结果绘制出来并保存到当前目录下（未经Sagemaker Neo优化的检测结果```body_det_vis.jpg```，
 经Sagemaker Neo优化后的推理模型检测结果```body_det_vis_with_neo.jpg```）。
-运行时间开销输出结果如下：
+
+未经Neo优化和经过Neo优化后的推理结果可视化分别如下所示：
+<div align=center>
+<img src=https://raw.githubusercontent.com/aws-samples/amazon-ipc-ai-saas/main/source/neo/body_det_vis.jpg width=50% />
+</div>
+
+<div align=center>
+<img src=https://raw.githubusercontent.com/aws-samples/amazon-ipc-ai-saas/main/source/neo/body_det_vis_with_neo.jpg width=50% />
+</div>
+
+可以看出Sagemaker Neo的优化基本没有影响到检测的精确度，运行时间开销输出结果如下：
 ```
 [NEO Optimization Disabled] Time Cost per Frame (input size = 1x3x416x624) = 23.388335704803467 ms
 [NEO Optimization Enabled] Time Cost per Frame (input size = 1x3x416x624) = 10.05416750907898 ms
