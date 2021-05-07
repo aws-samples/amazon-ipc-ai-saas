@@ -24,13 +24,15 @@ MXNet models must be saved as a single symbol file *-symbol.json and a single pa
 为了说明整个Sagemaker Neo优化的详细流程，该文档以`yolo3_mobilenet1.0_coco`人形检测模型为例进行模型准备，Neo编译，以及测试。
 
 模型准备分为两步，分别如下：
-- 第一步： 下载`yolo3_mobilenet1.0_coco`人形检测模型；
+- 第一步： 下载`yolo3_mobilenet1.0_coco`人形检测模型:
+
 ```
 wget -c https://ipc-models-zoo.s3.amazonaws.com/body-detector/body_detector_yolo3_mobilenet1.0_coco-0000.params
 wget -c https://ipc-models-zoo.s3.amazonaws.com/body-detector/body_detector_yolo3_mobilenet1.0_coco-symbol.json
 ```
 
-- 第二步：将上述两个文件打成`.tar.gz`包，即执行如下python脚本；
+- 第二步：将上述两个文件打成`.tar.gz`包，即执行如下python脚本:
+
 ```
 import tarfile
 
@@ -39,6 +41,7 @@ for name in ["body_detector_yolo3_mobilenet1.0_coco-0000.params", "body_detector
     tar.add(name)
 tar.close()
 ```
+
 脚本执行完毕，会在当前目录生成名为`body_detector_yolo3_mobilenet1.0_coco.tar.gz`的文件，该文件为Sagemaker Neo编译任务的输入。
 
 
@@ -91,7 +94,9 @@ cd models/human_body_detector_neo
 wget -c https://ipc-models-zoo.s3.amazonaws.com/body-detector/body_detector_yolo3_mobilenet1.0_coco-LINUX_X86_64_NVIDIA.tar.gz
 tar -zxvf body_detector_yolo3_mobilenet1.0_coco-LINUX_X86_64_NVIDIA.tar.gz
 ```
+
 上述命令执行之后，在`neo/`目录下的结构如下所示：
+
 ```
 .
 ├── eval.py
@@ -110,6 +115,7 @@ tar -zxvf body_detector_yolo3_mobilenet1.0_coco-LINUX_X86_64_NVIDIA.tar.gz
 
 安装`neo-ai-dlr`软件和`gluoncv`依赖包，参考[https://github.com/neo-ai/neo-ai-dlr/releases](https://github.com/neo-ai/neo-ai-dlr/releases)；
 这里测试平台为Amazon g4dn.xlarge，安装命令如下：
+
 ```
 wget -c https://neo-ai-dlr-release.s3-us-west-2.amazonaws.com/v1.9.0/gpu/dlr-1.9.0-py3-none-any.whl
 source activate mxnet_latest_p37
@@ -126,19 +132,18 @@ python3 eval.py
 经Sagemaker Neo优化后的推理模型检测结果```body_det_vis_with_neo.jpg```）。
 
 未经Neo优化和经过Neo优化后的推理结果可视化分别如下所示：
-<div align=center>
-<img src=https://raw.githubusercontent.com/aws-samples/amazon-ipc-ai-saas/main/source/neo/body_det_vis.jpg width=50% />
-</div>
 
-<div align=center>
-<img src=https://raw.githubusercontent.com/aws-samples/amazon-ipc-ai-saas/main/source/neo/body_det_vis_with_neo.jpg width=50% />
-</div>
+![image_without_neo_optimization](https://raw.githubusercontent.com/aws-samples/amazon-ipc-ai-saas/main/source/neo/body_det_vis.jpg)
+![image_with_neo_optimization](https://raw.githubusercontent.com/aws-samples/amazon-ipc-ai-saas/main/source/neo/body_det_vis_with_neo.jpg)
+
 
 可以看出Sagemaker Neo的优化基本没有影响到检测的精确度，运行时间开销输出结果如下：
+
 ```
 [NEO Optimization Disabled] Time Cost per Frame (input size = 1x3x416x624) = 23.388335704803467 ms
 [NEO Optimization Enabled] Time Cost per Frame (input size = 1x3x416x624) = 10.05416750907898 ms
 ```
+
 Sagemaker Neo优化过的模型可以将推理速度提升一倍以上，该推理时间不含将图像进行base64解码以及resize的部分。
 
 > 注意：在测试结束之后，关闭该实例，避免产生不必要的费用。
