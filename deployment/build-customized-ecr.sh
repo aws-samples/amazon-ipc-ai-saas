@@ -57,7 +57,7 @@ echo "--------------------------------------------------------------------------
 echo "[Build] Build Customized Deep Learning Image (CPU Version)                    "
 echo "------------------------------------------------------------------------------"
 cd ${SOURCE_DIR}
-IMAGE_NAME=your_deep_learning_model_name_cpu
+IMAGE_NAME=your-deep-learning-model-name-cpu
 docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f containers/customized-application/Dockerfile containers/customized-application/ --build-arg REGISTRY_URI=${REGISTRY_URI_CPU}
 docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
 
@@ -74,7 +74,7 @@ echo "--------------------------------------------------------------------------
 echo "[Build] Build Customized Deep Learning Image (GPU Version)                    "
 echo "------------------------------------------------------------------------------"
 cd ${SOURCE_DIR}
-IMAGE_NAME=your_deep_learning_model_name_gpu
+IMAGE_NAME=your-deep-learning-model-name-gpu
 docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f containers/customized-application/Dockerfile containers/customized-application/ --build-arg REGISTRY_URI=${REGISTRY_URI_GPU}
 docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
 
