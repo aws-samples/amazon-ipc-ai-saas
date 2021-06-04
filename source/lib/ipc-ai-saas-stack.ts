@@ -94,7 +94,7 @@ export class IpcAiSaasStack extends cdk.Stack {
         this,
         'events',
         {
-            bucketName: `ipc-ai-saas-${applicationType.valueAsString}-events`,
+            // bucketName: `ipc-ai-saas-${applicationType.valueAsString}-events`,
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
         }
