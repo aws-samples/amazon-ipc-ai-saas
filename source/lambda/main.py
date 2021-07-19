@@ -30,7 +30,7 @@ def handler(event, context):
     }
     short_size = short_size_lut.get(deploy_model_name)
 
-    if service_ype in ['face-detection', 'body-detection']:
+    if service_ype in ['face-detection', 'body-detection', 'vehicles-detection']:
         request = json.loads(event['body'])
         image_base64_enc = request['image_base64_enc']
         timestamp = request['timestamp']

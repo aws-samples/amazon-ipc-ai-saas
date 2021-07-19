@@ -11,7 +11,7 @@ import requests
 
 class DetectorSimulator(object):
     def __init__(self, endpoint_url, test_images_dir):
-        self._endpoint_url = endpoint_url + '/inference'
+        self._endpoint_url = endpoint_url + 'inference'
         self._test_images_dir = test_images_dir
 
     @staticmethod
@@ -70,7 +70,7 @@ class DetectorSimulator(object):
 
 if __name__ == '__main__':
     simulator = DetectorSimulator(
-        endpoint_url="",
+        endpoint_url="https://85cjunaoi7.execute-api.us-east-1.amazonaws.com/prod/",
         test_images_dir='./vehicles/'
     )
     simulator.run()

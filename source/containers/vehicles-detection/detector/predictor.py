@@ -36,21 +36,15 @@ class ObjectDetectionService(object):
             t1 = time.time()
             saved_model = tf.saved_model.load(MODEL_ROOT_PATH, tags=[tag_constants.SERVING])
             t2 = time.time()
-            print('Load Model Time Cost = {}'.format(t2 - t1))
+            print('[Tensorflow TensorRT] Time cost of loading saved model = {}'.format(t2 - t1))
             graph_func = saved_model.signatures[signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY]
             t3 = time.time()
-            print('Signatures Time Cost = {}'.format(t3 - t2))
+            print('[Tensorflow TensorRT] Time cost of Signature = {}'.format(t3 - t2))
             cls.detector = convert_to_constants.convert_variables_to_constants_v2(graph_func)
             t4 = time.time()
-            print('convert_to_constants Time Cost = {}'.format(t4 - t3))
+            print('[Tensorflow TensorRT] Time cost of Converting to Constants = {}'.format(t4 - t3))
 
         return cls.detector
-
-    # @classmethod
-    # def warmup(cls, dummy_data):
-    #     detector = cls.load_model()
-    #     for i in range(5):
-    #         detector(dummy_data)
 
     @classmethod
     def predict(cls, image_batch_data):
@@ -74,9 +68,7 @@ def ping():
 
     :return:
     """
-    print('Health Check...')
     health = ObjectDetectionService.detector is not None
-    print('Health = {}'.format(health))
     status = 200 if health else 404
     return flask.Response(response='\n', status=status, mimetype='application/json')
 
@@ -111,10 +103,13 @@ def transformation():
 
     # decode image
     base64_decoded = base64.b64decode(image_bytes)
+    print("base64_decoded = {}".format(base64_decoded))
 
     # get Image object and obtain its original height, width, channels
     image = Image.open(io.BytesIO(base64_decoded))
-    height, width, channels = image.shape
+    print("image = {}".format(image))
+    height, width = image.size
+    channels = len(image.getbands())
 
     # resize the image and store the scaling ratio in both width and height dimension
     resized_image = image.resize((512, 512))
@@ -144,7 +139,7 @@ def transformation():
 
     ret_bbox_coords = list()    # shape = (N, 4)
     ret_bbox_scores = list()    # shape = (N, 1)
-    ret_class_ids = list()      # shape = (N, 1)
+    ret_class_names = list()    # shape = (N, 1)
 
     for index in range(valid_detections[0]):
         [scale_y_min, scale_x_min, scale_y_max, scale_x_max] = bbox_coords[0][index]
@@ -158,15 +153,15 @@ def transformation():
             int(scale_y_max * 512 / scale_height_ratio),
         ])
         ret_bbox_scores.append([confidence])
-        ret_class_ids.append([cls_id])
+        ret_class_names.append([cls_id_cls_name_mapping[cls_id]])
 
     ret_bbox_coords = np.array(ret_bbox_coords)
     ret_bbox_scores = np.array(ret_bbox_scores)
-    ret_class_ids = np.array(ret_class_ids)
+    ret_class_names = np.array(ret_class_names)
 
     print('ret_bbox_coords.shape = {}'.format(ret_bbox_coords.shape))
     print('ret_bbox_scores.shape = {}'.format(ret_bbox_scores.shape))
-    print('ret_class_ids.shape = {}'.format(ret_class_ids.shape))
+    print('ret_class_names.shape = {}'.format(ret_class_names.shape))
 
     body = {
         'width': width,
@@ -174,7 +169,7 @@ def transformation():
         'channels': channels,
         'bbox_scores': ret_bbox_scores,     # shape = (N, 1)
         'bbox_coords': ret_bbox_coords,     # shape = (N, 4)
-        'class_ids': ret_class_ids,         # shape = (N, 1)
+        'class_names': ret_class_names,     # shape = (N, 1)
     }
     t_end = time.time()
     print('Time consumption = {} second'.format(t_end - t_start))
