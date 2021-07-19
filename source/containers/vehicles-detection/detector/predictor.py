@@ -103,11 +103,9 @@ def transformation():
 
     # decode image
     base64_decoded = base64.b64decode(image_bytes)
-    print("base64_decoded = {}".format(base64_decoded))
 
     # get Image object and obtain its original height, width, channels
     image = Image.open(io.BytesIO(base64_decoded))
-    print("image = {}".format(image))
     height, width = image.size
     channels = len(image.getbands())
 
@@ -153,15 +151,16 @@ def transformation():
             int(scale_y_max * 512 / scale_height_ratio),
         ])
         ret_bbox_scores.append([confidence])
-        ret_class_names.append([cls_id_cls_name_mapping[cls_id]])
+        cls_name = cls_id_cls_name_mapping[int(np.array(cls_id))]
+        ret_class_names.append([cls_name])
 
     ret_bbox_coords = np.array(ret_bbox_coords)
     ret_bbox_scores = np.array(ret_bbox_scores)
     ret_class_names = np.array(ret_class_names)
 
-    print('ret_bbox_coords.shape = {}'.format(ret_bbox_coords.shape))
-    print('ret_bbox_scores.shape = {}'.format(ret_bbox_scores.shape))
-    print('ret_class_names.shape = {}'.format(ret_class_names.shape))
+    # print('ret_bbox_coords.shape = {}'.format(ret_bbox_coords.shape))
+    # print('ret_bbox_scores.shape = {}'.format(ret_bbox_scores.shape))
+    # print('ret_class_names.shape = {}'.format(ret_class_names.shape))
 
     body = {
         'width': width,
