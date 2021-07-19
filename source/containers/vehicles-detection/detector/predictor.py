@@ -17,7 +17,6 @@ for gpu in gpus:
 
 
 MODEL_ROOT_PATH = '/opt/ml/model/yolov4-512x512-vehicles-detection-tensorflow-tensorrt/'
-PROCESS_START_TIMESTAMP = time.time()
 
 
 class ObjectDetectionService(object):
@@ -60,7 +59,10 @@ class ObjectDetectionService(object):
         return pred_bbox
 
 
-# The flask app for serving predictions
+# initialize the detection model
+_ = ObjectDetectionService.load_model()
+
+# the flask app for serving predictions
 app = flask.Flask(__name__)
 
 
@@ -73,7 +75,7 @@ def ping():
     :return:
     """
     print('Health Check...')
-    health = ObjectDetectionService.load_model() is not None
+    health = ObjectDetectionService.detector is not None
     print('Health = {}'.format(health))
     status = 200 if health else 404
     return flask.Response(response='\n', status=status, mimetype='application/json')
