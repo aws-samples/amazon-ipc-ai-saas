@@ -7,8 +7,7 @@ RUN apt-get -y update && \
     && rm -rf /var/lib/apt/lists/*
 
 RUN /usr/local/bin/python3.7 -m pip install --upgrade pip
-RUN pip3 install --no-cache tensorflow-gpu==2.4.0 \
-    Pillow==8.3.1 \
+RUN pip3 install --no-cache Pillow==8.3.1 \
     numpy==1.19.5 \
     flask==1.1.2 \
     gevent==20.12.1 \
