@@ -1,12 +1,18 @@
-# Reference: https://github.com/aws/deep-learning-containers/blob/master/available_images.md
-ARG REGISTRY_URI
-FROM ${REGISTRY_URI}
+# Reference: https://hub.docker.com/r/tensorflow/tensorflow/tags?page=1&ordering=last_updated
+FROM tensorflow/tensorflow:2.4.0-gpu
 
-RUN apt-get -y update && \
-    apt-get install -y nginx unzip \
-    && rm -rf /var/lib/apt/lists/*
+ARG DEBIAN_FRONTEND=noninteractive
 
-RUN /usr/local/bin/python3.7 -m pip install --upgrade pip
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends apt-utils \
+    nginx \
+    unzip \
+    wget \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/*
+
+
+RUN pip3 install --upgrade pip
 RUN pip3 install --no-cache Pillow==8.3.1 \
     numpy==1.19.5 \
     flask==1.1.2 \
