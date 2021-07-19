@@ -94,11 +94,12 @@ def transformation():
             mimetype='text/plain')
 
     cls_id_cls_name_mapping = {
-        0: 'pedestrian',
-        1: 'riders',
-        2: 'pv person',
-        3: 'ignore',
-        4: 'crowd'
+        0: 'bicycle',
+        1: 'car',
+        2: 'motorcycle',
+        3: 'bus',
+        4: 'train',
+        5: 'truck'
     }
 
     # decode image
