@@ -66,7 +66,9 @@ def ping():
 
     :return:
     """
+    print('PING...')
     health = ObjectDetectionService.load_model() is not None
+    print('Health = {}'.format(health))
     status = 200 if health else 404
     return flask.Response(response='\n', status=status, mimetype='application/json')
 
