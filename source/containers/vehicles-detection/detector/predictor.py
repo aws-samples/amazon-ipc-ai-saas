@@ -34,9 +34,16 @@ class ObjectDetectionService(object):
         :return:
         """
         if cls.detector is None:
+            t1 = time.time()
             saved_model = tf.saved_model.load(MODEL_ROOT_PATH, tags=[tag_constants.SERVING])
+            t2 = time.time()
+            print('Load Model Time Cost = {}'.format(t2 - t1))
             graph_func = saved_model.signatures[signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY]
+            t3 = time.time()
+            print('Signatures Time Cost = {}'.format(t3 - t2))
             cls.detector = convert_to_constants.convert_variables_to_constants_v2(graph_func)
+            t4 = time.time()
+            print('convert_to_constants Time Cost = {}'.format(t4 - t3))
 
         return cls.detector
 
