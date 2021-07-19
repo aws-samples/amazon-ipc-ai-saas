@@ -34,13 +34,8 @@ class ObjectDetectionService(object):
         """
         if cls.detector is None:
             saved_model = tf.saved_model.load(MODEL_ROOT_PATH, tags=[tag_constants.SERVING])
-            print(saved_model)
-
             graph_func = saved_model.signatures[signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY]
-            print(graph_func)
-
             cls.detector = convert_to_constants.convert_variables_to_constants_v2(graph_func)
-            print(cls.detector)
 
         return cls.detector
 
