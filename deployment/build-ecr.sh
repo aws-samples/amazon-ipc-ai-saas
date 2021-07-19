@@ -46,25 +46,25 @@ echo REGISTRY_URI_GPU ${REGISTRY_URI_GPU}
 aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${DOMAIN}
 aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${REGISTRY_DOMAIN}
 
-
-#############################################################################################
-###                     Face Comparison Image Build & Push                                ###
-#############################################################################################
-echo "------------------------------------------------------------------------------"
-echo "[Build] Build Face Comparison Image (GPU Version)                             "
-echo "------------------------------------------------------------------------------"
-cd ${SOURCE_DIR}
-IMAGE_NAME=ipc-ai-saas-face-comparison-gpu
-docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f containers/face-comparison/Dockerfile containers/face-comparison/ --build-arg REGISTRY_URI=${REGISTRY_URI_GPU}
-docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
-
-echo "------------------------------------------------------------------------------"
-echo "[Push] Push Face Comparison Image (GPU Version)                               "
-echo "------------------------------------------------------------------------------"
-cd ${SOURCE_DIR}
-aws ecr create-repository --repository-name ${IMAGE_NAME} --region ${REGION} >/dev/null 2>&1
-docker push ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
-
+#
+##############################################################################################
+####                     Face Comparison Image Build & Push                                ###
+##############################################################################################
+#echo "------------------------------------------------------------------------------"
+#echo "[Build] Build Face Comparison Image (GPU Version)                             "
+#echo "------------------------------------------------------------------------------"
+#cd ${SOURCE_DIR}
+#IMAGE_NAME=ipc-ai-saas-face-comparison-gpu
+#docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f containers/face-comparison/Dockerfile containers/face-comparison/ --build-arg REGISTRY_URI=${REGISTRY_URI_GPU}
+#docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
+#
+#echo "------------------------------------------------------------------------------"
+#echo "[Push] Push Face Comparison Image (GPU Version)                               "
+#echo "------------------------------------------------------------------------------"
+#cd ${SOURCE_DIR}
+#aws ecr create-repository --repository-name ${IMAGE_NAME} --region ${REGION} >/dev/null 2>&1
+#docker push ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
+#
 #
 #
 ##############################################################################################

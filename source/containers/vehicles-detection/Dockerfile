@@ -6,6 +6,7 @@ RUN apt-get -y update && \
     apt-get install -y nginx unzip \
     && rm -rf /var/lib/apt/lists/*
 
+RUN /usr/local/bin/python3.7 -m pip install --upgrade pip
 RUN pip3 install --no-cache Pillow==8.3.1 \
     numpy==1.19.5 \
     flask==1.1.2 \
@@ -14,7 +15,7 @@ RUN pip3 install --no-cache Pillow==8.3.1 \
 
 # download model parameters
 RUN mkdir -p /opt/ml/model
-RUN wget -c https://ip-camera-ai-saas.s3.amazonaws.com/model-zoo/vehicles_detection/yolov4-512x512-vehicles-detection-tensorflow-tensorrt.zip -O /opt/ml/model/.
+RUN wget -c https://ip-camera-ai-saas.s3.amazonaws.com/model-zoo/vehicles_detection/yolov4-512x512-vehicles-detection-tensorflow-tensorrt.zip -O /opt/ml/model/yolov4-512x512-vehicles-detection-tensorflow-tensorrt.zip
 RUN unzip /opt/ml/model/yolov4-512x512-vehicles-detection-tensorflow-tensorrt.zip -d /opt/ml/model/yolov4-512x512-vehicles-detection-tensorflow-tensorrt
 
 # Set some environment variables. PYTHONUNBUFFERED keeps Python from buffering our standard
