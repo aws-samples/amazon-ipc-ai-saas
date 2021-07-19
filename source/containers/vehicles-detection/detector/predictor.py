@@ -55,7 +55,6 @@ class ObjectDetectionService(object):
 
 # The flask app for serving predictions
 app = flask.Flask(__name__)
-ObjectDetectionService.load_model()
 
 
 @app.route('/ping', methods=['GET'])
@@ -66,7 +65,7 @@ def ping():
 
     :return:
     """
-    print('PING...')
+    print('Health Check...')
     health = ObjectDetectionService.load_model() is not None
     print('Health = {}'.format(health))
     status = 200 if health else 404
