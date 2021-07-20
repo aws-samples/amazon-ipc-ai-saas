@@ -14,17 +14,10 @@ import os
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
 
-# tf.config.experimental.set_memory_growth(gpus[0], True)
 try:
-    tf.config.experimental.set_virtual_device_configuration(
-        gpus[0],
-        [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024 * 7)]
-    )
+    tf.config.experimental.set_memory_growth(gpus[0], True)
 except RuntimeError as e:
     print(e)
-
-command = "nvidia-smi"
-os.system(command)
 
 MODEL_ROOT_PATH = '/opt/ml/model/yolov4-512x512-vehicles-detection-tensorflow-tensorrt/'
 
@@ -77,6 +70,9 @@ _ = ObjectDetectionService.load_model()
 
 # warm up the inference
 ObjectDetectionService.warmup()
+
+command = "nvidia-smi"
+os.system(command)
 
 # the flask app for serving predictions
 app = flask.Flask(__name__)
