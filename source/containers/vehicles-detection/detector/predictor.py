@@ -9,12 +9,22 @@ import numpy as np
 import json
 import io
 from PIL import Image
+import os
 
 
 gpus = tf.config.experimental.list_physical_devices('GPU')
-for gpu in gpus:
-    tf.config.experimental.set_memory_growth(gpu, True)
 
+# tf.config.experimental.set_memory_growth(gpus[0], True)
+try:
+    tf.config.experimental.set_virtual_device_configuration(
+        gpus[0],
+        [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024 * 7)]
+    )
+except RuntimeError as e:
+    print(e)
+
+command = "nvidia-smi"
+os.system(command)
 
 MODEL_ROOT_PATH = '/opt/ml/model/yolov4-512x512-vehicles-detection-tensorflow-tensorrt/'
 
@@ -49,7 +59,7 @@ class ObjectDetectionService(object):
     @classmethod
     def warmup(cls):
         if cls.detector is not None:
-            for _ in range(5):
+            for _ in range(3):
                 print('Warm up the model...')
                 images_data = np.zeros(shape=(1, 512, 512, 3), dtype=np.float32)
                 batch_data = tf.constant(images_data)
