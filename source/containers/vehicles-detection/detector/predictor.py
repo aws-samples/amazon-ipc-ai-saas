@@ -81,7 +81,7 @@ def transformation():
 
     :return:
     """
-    t_start = time.time()
+    t1 = time.time()
 
     if flask.request.content_type == 'application/json':
         request_body = flask.request.data.decode('utf-8')
@@ -101,6 +101,7 @@ def transformation():
         4: 'train',
         5: 'truck'
     }
+    t2 = time.time()
 
     # decode image
     base64_decoded = base64.b64decode(image_bytes)
@@ -120,12 +121,14 @@ def transformation():
     resized_normalized_image = resized_image_np / 255.0
     images_data = np.asarray([resized_normalized_image]).astype(np.float32)
     batch_data = tf.constant(images_data)
+    t3 = time.time()
 
     # inference
     res = ObjectDetectionService.predict(image_batch_data=batch_data)
     matrix = res[0]
     boxes = matrix[:, :, 0:4]
     pred_conf = matrix[:, :, 4:]
+    t4 = time.time()
 
     bbox_coords, bbox_scores, class_ids, valid_detections = tf.image.combined_non_max_suppression(
         boxes=tf.reshape(boxes, (tf.shape(boxes)[0], -1, 1, 4)),
@@ -142,8 +145,8 @@ def transformation():
 
     for index in range(valid_detections[0]):
         [scale_y_min, scale_x_min, scale_y_max, scale_x_max] = bbox_coords[0][index]
-        confidence = bbox_scores[0][index]
-        cls_id = class_ids[0][index]
+        confidence = float(bbox_scores[0][index])
+        cls_id = int(class_ids[0][index])
 
         ret_bbox_coords.append([
             int(scale_x_min * 512 / scale_width_ratio),
@@ -152,16 +155,10 @@ def transformation():
             int(scale_y_max * 512 / scale_height_ratio),
         ])
         ret_bbox_scores.append([confidence])
-        cls_name = cls_id_cls_name_mapping[int(np.array(cls_id))]
+        cls_name = cls_id_cls_name_mapping[cls_id]
         ret_class_names.append([cls_name])
 
-    ret_bbox_coords = np.array(ret_bbox_coords)
-    ret_bbox_scores = np.array(ret_bbox_scores)
-    ret_class_names = np.array(ret_class_names)
-
-    # print('ret_bbox_coords.shape = {}'.format(ret_bbox_coords.shape))
-    # print('ret_bbox_scores.shape = {}'.format(ret_bbox_scores.shape))
-    # print('ret_class_names.shape = {}'.format(ret_class_names.shape))
+    t5 = time.time()
 
     body = {
         'width': width,
@@ -171,8 +168,11 @@ def transformation():
         'bbox_coords': ret_bbox_coords,     # shape = (N, 4)
         'class_names': ret_class_names,     # shape = (N, 1)
     }
-    t_end = time.time()
-    print('Time consumption = {} second'.format(t_end - t_start))
+    print('Time Cost of Image input = {} second'.format(t2 - t1))
+    print('Time Cost of Pre-process = {} second'.format(t3 - t2))
+    print('Time Cost of Inference = {} second'.format(t4 - t3))
+    print('Time Cost of Post-process = {} second'.format(t5 - t4))
+    print('Total Time Cost = {}'.format(t5 - t1))
     print('Response = {}'.format(body))
 
     return flask.Response(response=json.dumps(body), status=200, mimetype='application/json')
