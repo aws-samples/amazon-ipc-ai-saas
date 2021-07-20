@@ -113,7 +113,7 @@ def transformation():
     t3 = time.time()
 
     # resize the image and store the scaling ratio in both width and height dimension
-    resized_image = image.resize((512, 512))
+    resized_image = image.resize((512, 512), Image.NEAREST)
     scale_height_ratio = 512.0 / height
     scale_width_ratio = 512.0 / width
     t4 = time.time()
@@ -141,6 +141,11 @@ def transformation():
         score_threshold=0.0
     )
     t7 = time.time()
+
+    # convert EagerTensor to Numpy format
+    bbox_coords = bbox_coords.numpy()
+    bbox_scores = bbox_scores.numpy()
+    class_ids = class_ids.numpy()
 
     ret_bbox_coords = list()    # shape = (N, 4)
     ret_bbox_scores = list()    # shape = (N, 1)
