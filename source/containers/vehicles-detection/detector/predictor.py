@@ -108,27 +108,29 @@ def transformation():
 
     # get Image object and obtain its original height, width, channels
     image = Image.open(io.BytesIO(base64_decoded))
-    height, width = image.size
+    width, height = image.size
     channels = len(image.getbands())
+    t3 = time.time()
 
     # resize the image and store the scaling ratio in both width and height dimension
     resized_image = image.resize((512, 512))
     scale_height_ratio = 512.0 / height
     scale_width_ratio = 512.0 / width
+    t4 = time.time()
 
     # convert image data into tensor
     resized_image_np = np.array(resized_image)
     resized_normalized_image = resized_image_np / 255.0
     images_data = np.asarray([resized_normalized_image]).astype(np.float32)
     batch_data = tf.constant(images_data)
-    t3 = time.time()
+    t5 = time.time()
 
     # inference
     res = ObjectDetectionService.predict(image_batch_data=batch_data)
     matrix = res[0]
     boxes = matrix[:, :, 0:4]
     pred_conf = matrix[:, :, 4:]
-    t4 = time.time()
+    t6 = time.time()
 
     bbox_coords, bbox_scores, class_ids, valid_detections = tf.image.combined_non_max_suppression(
         boxes=tf.reshape(boxes, (tf.shape(boxes)[0], -1, 1, 4)),
@@ -138,6 +140,7 @@ def transformation():
         iou_threshold=0.45,
         score_threshold=0.0
     )
+    t7 = time.time()
 
     ret_bbox_coords = list()    # shape = (N, 4)
     ret_bbox_scores = list()    # shape = (N, 1)
@@ -158,7 +161,7 @@ def transformation():
         cls_name = cls_id_cls_name_mapping[cls_id]
         ret_class_names.append([cls_name])
 
-    t5 = time.time()
+    t8 = time.time()
 
     body = {
         'width': width,
@@ -169,10 +172,14 @@ def transformation():
         'class_names': ret_class_names,     # shape = (N, 1)
     }
     print('Time Cost of Image input = {} second'.format(t2 - t1))
-    print('Time Cost of Pre-process = {} second'.format(t3 - t2))
-    print('Time Cost of Inference = {} second'.format(t4 - t3))
-    print('Time Cost of Post-process = {} second'.format(t5 - t4))
-    print('Total Time Cost = {}'.format(t5 - t1))
+    print('Time Cost of Decode Image & IO Image Open = {} second'.format(t3 - t2))
+    print('Time Cost of Image Resize = {} second'.format(t4 - t3))
+    print('Time Cost of Tensor Conversion = {} second'.format(t5 - t4))
+    print('Time Cost of Inference = {} second'.format(t6 - t5))
+    print('Time Cost of NMS = {} second'.format(t7 - t6))
+    print('Time Cost of Output JSON Preparation = {} second'.format(t8 - t7))
+
+    print('Total Time Cost = {}'.format(t8 - t1))
     print('Response = {}'.format(body))
 
     return flask.Response(response=json.dumps(body), status=200, mimetype='application/json')

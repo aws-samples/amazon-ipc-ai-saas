@@ -60,17 +60,32 @@ class DetectorSimulator(object):
 
             bbox_coords = np.array(response['bbox_coords'])
             bbox_scores = np.array(response['bbox_scores'])
-            class_ids = np.zeros(shape=(bbox_scores.shape[0], ))
+            class_names = np.array(response['class_names'])
             print('bbox_coords.shape = {}'.format(bbox_coords.shape))
             print('bbox_scores.shape = {}'.format(bbox_scores.shape))
+            print('class_names.shape = {}'.format(class_names.shape))
 
-            self.visualize(full_path, bbox_coords, bbox_scores, class_ids,
-                           class_names=['pedestrian', 'riders', 'pv person', 'ignore', 'crowd'])
+            cls_name_cls_id_mapping = {
+                'bicycle': 0,
+                'car': 1,
+                'motorcycle': 2,
+                'bus': 3,
+                'train': 4,
+                'truck': 5
+            }
+
+            cls_ids = list()
+            for cls_name in class_names:
+                cls_id = cls_name_cls_id_mapping[cls_name[0]]
+                cls_ids.append([cls_id])
+
+            self.visualize(full_path, np.array(bbox_coords), np.array(bbox_scores), np.array(cls_ids),
+                           class_names=['bicycle', 'car', 'motorcycle', 'bus', 'train', 'truck'])
 
 
 if __name__ == '__main__':
     simulator = DetectorSimulator(
-        endpoint_url="https://sdi6d1j731.execute-api.us-east-1.amazonaws.com/prod/",
+        endpoint_url="https://tnhsui6372.execute-api.us-east-1.amazonaws.com/prod/",
         test_images_dir='./vehicles/'
     )
     simulator.run()
