@@ -47,6 +47,15 @@ class ObjectDetectionService(object):
         return cls.detector
 
     @classmethod
+    def warmup(cls):
+        if cls.detector is not None:
+            for _ in range(5):
+                print('Warm up the model...')
+                images_data = np.zeros(shape=(1, 512, 512, 3), dtype=np.float32)
+                batch_data = tf.constant(images_data)
+                _ = ObjectDetectionService.predict(image_batch_data=batch_data)
+
+    @classmethod
     def predict(cls, image_batch_data):
         detector = cls.load_model()
         pred_bbox = detector(image_batch_data)
@@ -55,6 +64,9 @@ class ObjectDetectionService(object):
 
 # initialize the detection model
 _ = ObjectDetectionService.load_model()
+
+# warm up the inference
+ObjectDetectionService.warmup()
 
 # the flask app for serving predictions
 app = flask.Flask(__name__)
