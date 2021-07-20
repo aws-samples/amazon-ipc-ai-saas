@@ -11,13 +11,13 @@ import io
 from PIL import Image
 import os
 
-
 gpus = tf.config.experimental.list_physical_devices('GPU')
-
-try:
-    tf.config.experimental.set_memory_growth(gpus[0], True)
-except RuntimeError as e:
-    print(e)
+if gpus:
+    for gpu in gpus:
+        try:
+            tf.config.experimental.set_memory_growth(gpus, True)
+        except RuntimeError as e:
+            print(e)
 
 MODEL_ROOT_PATH = '/opt/ml/model/yolov4-512x512-vehicles-detection-tensorflow-tensorrt/'
 
