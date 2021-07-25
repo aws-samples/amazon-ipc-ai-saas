@@ -57,7 +57,7 @@ RUN chmod +x /opt/program/serve
 WORKDIR /opt/program
 
 # BUILD libyolo_layer.so
-RUN cd /opt/program/plugins && make -j4
+RUN cd /opt/program/plugins && make
 ENV LD_LIBRARY_PATH="/opt/program/plugins/plugins:${LD_LIBRARY_PATH}"
 
 ENTRYPOINT ["python", "serve"]
