@@ -3,7 +3,7 @@ FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu18.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PATH="/usr/local/cuda/bin:${PATH}"
-ENV LD_LIBRARY_PATH=""/usr/local/cuda/lib64:${LD_LIBRARY_PATH}"
+ENV LD_LIBRARY_PATH="/usr/local/cuda/lib64:${LD_LIBRARY_PATH}"
 
 
 # INSTALL DEPENDENCIES
