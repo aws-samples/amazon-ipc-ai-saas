@@ -35,9 +35,12 @@ RUN apt-get -y install libnvinfer-plugin-dev=7.2.3-1+cuda11.1
 RUN apt-get -y install libnvparsers-dev=7.2.3-1+cuda11.1
 RUN apt-get -y install libnvonnxparsers-dev=7.2.3-1+cuda11.1
 RUN apt-get -y install libnvinfer-samples=7.2.3-1+cuda11.1
-
 RUN apt-get install -y tensorrt
-RUN apt-get install -y python3-libnvinfer-dev
+# RUN apt-get install -y python3-libnvinfer-dev
+
+# INSTALL PyCuda
+RUN pip3 install pycuda
+
 
 # download model parameters
 RUN mkdir -p /opt/ml/model
@@ -58,6 +61,6 @@ WORKDIR /opt/program
 
 # BUILD libyolo_layer.so
 RUN cd /opt/program/plugins && make
-ENV LD_LIBRARY_PATH="/opt/program/plugins/plugins:${LD_LIBRARY_PATH}"
+ENV LD_LIBRARY_PATH="/opt/program/plugins:${LD_LIBRARY_PATH}"
 
 ENTRYPOINT ["python", "serve"]

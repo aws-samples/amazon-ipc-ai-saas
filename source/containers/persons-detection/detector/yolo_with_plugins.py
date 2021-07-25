@@ -13,7 +13,7 @@ import pycuda.driver as cuda
 
 
 try:
-    ctypes.cdll.LoadLibrary('../plugins/libyolo_layer.so')
+    ctypes.cdll.LoadLibrary('/opt/program/plugins/libyolo_layer.so')
 except OSError as e:
     raise SystemExit('ERROR: failed to load ./plugins/libyolo_layer.so.  '
                      'Did you forget to do a "make" in the "./plugins/" '
