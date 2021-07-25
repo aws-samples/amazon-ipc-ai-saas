@@ -49,6 +49,8 @@ class DetectorSimulator(object):
                 "image_base64_enc": image_base64_enc
             }
 
+            json.dump(request_body, open('vehicle_detect_post_data.txt', 'w'))
+
             t1 = time.time()
             response = requests.post(self._endpoint_url, data=json.dumps(request_body))
             t2 = time.time()
@@ -85,7 +87,7 @@ class DetectorSimulator(object):
 
 if __name__ == '__main__':
     simulator = DetectorSimulator(
-        endpoint_url="https://1mzz2055ce.execute-api.us-east-1.amazonaws.com/prod/",
+        endpoint_url="https://l8hfj5gajg.execute-api.us-east-1.amazonaws.com/prod/",
         test_images_dir='./vehicles/'
     )
     simulator.run()
