@@ -8,7 +8,7 @@ NVCC=nvcc
 computes=
 
 ifeq ($(computes), )
-  computes= $(shell python gpu_cc.py)
+  computes= $(shell python3 gpu_cc.py)
   $(info computes: $(computes))
 endif
 
