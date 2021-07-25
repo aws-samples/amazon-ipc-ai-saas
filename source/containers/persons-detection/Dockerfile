@@ -1,6 +1,8 @@
 # Reference: https://hub.docker.com/layers/nvidia/cuda/11.1.1-cudnn8-runtime-ubuntu18.04/images
 FROM nvidia/cuda:11.1.1-cudnn8-runtime-ubuntu18.04
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get -y update && \
     apt-get install -y nginx \
     wget \

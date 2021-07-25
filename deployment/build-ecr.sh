@@ -26,7 +26,6 @@ else
 fi
 
 echo ECR_DOMAIN ${DOMAIN}
-echo REGISTRY_URI_GPU ${REGISTRY_URI_GPU}
 
 aws ecr get-login-password --region ${REGION} | docker login --username AWS --password-stdin ${DOMAIN}
 
