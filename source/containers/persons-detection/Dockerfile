@@ -1,6 +1,10 @@
 # Reference: https://hub.docker.com/layers/nvidia/cuda/11.1.1-cudnn8-runtime-ubuntu18.04/images
 FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu18.04
+
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH="/usr/local/cuda/bin:${PATH}"
+ENV LD_LIBRARY_PATH=""/usr/local/cuda/lib64:${LD_LIBRARY_PATH}"
+
 
 # INSTALL DEPENDENCIES
 RUN apt-get -y update && \
@@ -8,13 +12,13 @@ RUN apt-get -y update && \
     wget \
     git \
     cmake \
-    libopencv-dev \
+    python3 \
+    python3-opencv \
     python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 RUN python3 -m pip install --upgrade pip==21.2.1
-RUN pip3 install --no-cache opencv-python==4.5.2.54 \
-    pycuda==2021.1 \
+RUN pip3 install --no-cache pycuda==2021.1 \
     Cython==0.29.24 \
     onnx==1.4.1 \
     numpy==1.19.5 \
@@ -56,4 +60,4 @@ ENV PYTHONUNBUFFERED=TRUE
 ENV PYTHONDONTWRITEBYTECODE=TRUE
 ENV PATH="/opt/program:${PATH}"
 
-ENTRYPOINT ["python", "serve"]
+ENTRYPOINT ["python3", "serve"]
