@@ -10,7 +10,7 @@ import pycuda.autoinit  # This is needed for initializing CUDA driver
 from yolo_with_plugins import TrtYOLO
 
 
-MODEL_FULL_PATH = '/opt/ml/model/yolov4-512x512-persons-detect.trt'
+MODEL_FULL_PATH = '/opt/ml/model/yolov4-persons.trt'
 CATEGORY_NUM = 5
 CLASS_ID_NAME_LUT = {
     0: 'pedestrian',

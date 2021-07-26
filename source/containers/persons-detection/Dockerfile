@@ -42,7 +42,7 @@ RUN apt-get -y update && \
 
 # DOWNLOAD INFERENCE MODEL WEIGHTS (TENSORRT)
 RUN mkdir -p /opt/ml/model
-# RUN wget -c https://ipc-models-zoo.s3.amazonaws.com/body-detector/body_detector_yolo3_mobilenet1.0_coco-symbol.json -O /opt/ml/model/body_detector_yolo3_mobilenet1.0_coco-symbol.json
+RUN wget -c https://ip-camera-ai-saas.s3.amazonaws.com/models/persons_detection/yolov4-persons.trt -O /opt/ml/model/yolov4-persons.trt
 
 # SETUP WORKDIR
 COPY detector /opt/program
