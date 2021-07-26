@@ -9,7 +9,6 @@ import ctypes
 
 CUDA_SUCCESS = 0
 
-
 def get_gpu_archs():
     libnames = ('libcuda.so', 'libcuda.dylib', 'cuda.dll')
     for libname in libnames:
@@ -49,7 +48,6 @@ def get_gpu_archs():
             gpu_archs.add(str(cc_major.value) + str(cc_minor.value))
 
     return list(gpu_archs)
-
 
 if __name__ == '__main__':
     print(' '.join(get_gpu_archs()))
