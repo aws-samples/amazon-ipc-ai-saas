@@ -18,14 +18,11 @@ export class IpcAiSaasStack extends cdk.Stack {
     const applicationType = new cdk.CfnParameter(this, 'applicationType', {
         description: 'Please choose your desired service type',
         type: 'String',
-        default: 'vehicles-detection',
+        default: 'persons-detection',
         allowedValues: [
-            'face-detection',
-            'face-comparison',
-            'person-detection',
+            'persons-detection',
             'pets-detection',
             'vehicles-detection',
-            'license-plate-recognition',
         ]
     });
 

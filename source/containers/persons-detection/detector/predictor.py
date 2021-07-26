@@ -23,7 +23,7 @@ CLASS_ID_NAME_LUT = {
 
 # A singleton for holding the model. This simply loads the model and holds it.
 # It has a predict function that does a prediction based on the model and the input data.
-class ObjectDetector(object):
+class ObjectDetectionService(object):
     detector = None
 
     @classmethod

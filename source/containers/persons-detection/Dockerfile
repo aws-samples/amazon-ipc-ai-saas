@@ -37,8 +37,9 @@ RUN apt-get -y update && \
     libnvparsers-dev=7.2.3-1+cuda11.1 \
     libnvonnxparsers-dev=7.2.3-1+cuda11.1 \
     libnvinfer-samples=7.2.3-1+cuda11.1 \
-    tensorrt \
-    python3-libnvinfer-dev
+    tensorrt
+
+RUN apt-get -y install python3-libnvinfer-dev
 
 # DOWNLOAD INFERENCE MODEL WEIGHTS (TENSORRT)
 RUN mkdir -p /opt/ml/model
