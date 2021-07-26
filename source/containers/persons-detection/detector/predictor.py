@@ -92,7 +92,7 @@ def transformation():
     t2 = time.time()
 
     # Inference
-    boxes, scores, class_ids = ObjectDetector.predict(image_data=image_data)
+    boxes, scores, class_ids = ObjectDetectionService.predict(image_data=image_data)
     t3 = time.time()
 
     ret_boxes = boxes.tolist()

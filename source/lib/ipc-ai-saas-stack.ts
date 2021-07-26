@@ -164,8 +164,6 @@ export class IpcAiSaasStack extends cdk.Stack {
             runtime: lambda.Runtime.PYTHON_3_8,
             environment: {
                 SAGEMAKER_ENDPOINT_NAME: sagemakerEndpoint.attrEndpointName,
-                SERVICE_TYPE: `${applicationType.valueAsString}`,
-                OBJECT_DETECTOR_MODEL_NAME: defaultDetectionModel,
                 EVENTS_S3_BUCKET_NAME: events.bucketName,
                 REQUEST_EVENTS_SNAPSHOT_ENABLED: `${saveRequestEvents.valueAsString}`,
             },
