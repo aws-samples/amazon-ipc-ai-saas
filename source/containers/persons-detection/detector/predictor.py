@@ -100,7 +100,7 @@ def transformation():
     ret_class_names = list()
 
     for score in scores:
-        ret_scores.append([score])
+        ret_scores.append([float(score)])
 
     for class_id in class_ids:
         ret_class_names.append([CLASS_ID_NAME_LUT[int(class_id)]])
@@ -116,9 +116,9 @@ def transformation():
 
     t4 = time.time()
     print('Total time cost = {} ms'.format(1000.0 * (t4 - t1)))
-    print('\tTime cost of image decoding = {} ms'.format(1000.0 * (t2 - t1)))
-    print('\tTime cost of inference (including image resize) = {} ms'.format(1000.0 * (t3 - t2)))
-    print('\tTime cost of response post-processing = {} ms'.format(1000.0 * (t4 - t3)))
+    print('Time cost of image decoding = {} ms'.format(1000.0 * (t2 - t1)))
+    print('Time cost of inference (including image resize) = {} ms'.format(1000.0 * (t3 - t2)))
+    print('Time cost of response post-processing = {} ms'.format(1000.0 * (t4 - t3)))
     print('Response = {}'.format(body))
 
     return flask.Response(response=json.dumps(body), status=200, mimetype='application/json')

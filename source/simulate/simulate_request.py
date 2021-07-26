@@ -90,7 +90,7 @@ class DetectorSimulator(object):
 
 if __name__ == '__main__':
     simulator = DetectorSimulator(
-        endpoint_url="https://2748v86huk.execute-api.us-east-1.amazonaws.com/prod/",
+        endpoint_url="https://us2ptjsvfi.execute-api.us-east-1.amazonaws.com/prod/",
         test_images_dir='./test_imgs/persons/'
     )
     simulator.run()
