@@ -111,7 +111,7 @@ def transformation():
         'channels': channels,
         'bbox_coords': ret_boxes,           # shape = (N, 4)
         'bbox_scores': ret_scores,          # shape = (N, 1)
-        'class_names': ret_class_names      # shape = (N, 4)
+        'class_names': ret_class_names      # shape = (N, 1)
     }
 
     t4 = time.time()

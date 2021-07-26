@@ -14,6 +14,14 @@ class DetectorSimulator(object):
         self._endpoint_url = endpoint_url + 'inference'
         self._test_images_dir = test_images_dir
 
+        self._cls_name_to_id_mapping = {
+            'pedestrian': 0,
+            'rider': 1,
+            'partially-visible person': 2,
+            'ignore region': 3,
+            'crowd': 4
+        }
+
     @staticmethod
     def get_base64_encoding(full_path):
         with open(full_path, "rb") as f:
@@ -32,7 +40,7 @@ class DetectorSimulator(object):
         plt.show()
 
     def run(self):
-        image_names = [f for f in os.listdir(self._test_images_dir) if f.startswith('test_')]
+        image_names = [f for f in os.listdir(self._test_images_dir) if f.endswith('jpg')]
         image_names = sorted(image_names)
 
         for name in image_names:
@@ -49,7 +57,7 @@ class DetectorSimulator(object):
                 "image_base64_enc": image_base64_enc
             }
 
-            json.dump(request_body, open('vehicle_detect_post_data.txt', 'w'))
+            # json.dump(request_body, open('post_data.txt', 'w'))
 
             t1 = time.time()
             response = requests.post(self._endpoint_url, data=json.dumps(request_body))
@@ -67,27 +75,22 @@ class DetectorSimulator(object):
             print('bbox_scores.shape = {}'.format(bbox_scores.shape))
             print('class_names.shape = {}'.format(class_names.shape))
 
-            cls_name_cls_id_mapping = {
-                'bicycle': 0,
-                'car': 1,
-                'motorcycle': 2,
-                'bus': 3,
-                'train': 4,
-                'truck': 5
-            }
-
             cls_ids = list()
             for cls_name in class_names:
-                cls_id = cls_name_cls_id_mapping[cls_name[0]]
+                cls_id = self._cls_name_to_id_mapping[cls_name[0]]
                 cls_ids.append([cls_id])
 
-            self.visualize(full_path, np.array(bbox_coords), np.array(bbox_scores), np.array(cls_ids),
-                           class_names=['bicycle', 'car', 'motorcycle', 'bus', 'train', 'truck'])
+            self.visualize(
+                full_path,
+                np.array(bbox_coords),
+                np.array(bbox_scores),
+                np.array(cls_ids),
+                class_names=['pedestrian', 'rider', 'partially-visible person', 'ignore region', 'crowd'])
 
 
 if __name__ == '__main__':
     simulator = DetectorSimulator(
         endpoint_url="https://l8hfj5gajg.execute-api.us-east-1.amazonaws.com/prod/",
-        test_images_dir='./vehicles/'
+        test_images_dir='./test_imgs/persons/'
     )
     simulator.run()
