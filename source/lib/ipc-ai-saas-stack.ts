@@ -9,7 +9,7 @@ import * as sagemaker from '@aws-cdk/aws-sagemaker';
 export class IpcAiSaasStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-    this.templateOptions.description = '(SO8016) - IP Camera AI SaaS Service Stack. Template version v2.0.0';
+    this.templateOptions.description = '(SO8016) - IP Camera AI SaaS Service Stack. Template version v1.0.0';
 
 
     /**
@@ -22,7 +22,7 @@ export class IpcAiSaasStack extends cdk.Stack {
         allowedValues: [
             'persons-detection',
             'pets-detection',
-            'vehicles-detection',
+            'vehicles-detection'
         ]
     });
 
@@ -38,18 +38,9 @@ export class IpcAiSaasStack extends cdk.Stack {
 
 
     /**
-     * Default Configuration
-     * Options for detection models could be [ 'ssd_512_resnet50_v1_coco', 'yolo3_darknet53_coco',
-     * 'yolo3_mobilenet1.0_coco', 'faster_rcnn_fpn_resnet101_v1d_coco' ]
-     *
-     * Options for face comparison models could be [ 'retinaface_mnet025_v2+LResNet100E-IR',
-     * 'retinaface_mnet025_v2+LResNet50E-IR', 'retinaface_mnet025_v2+LResNet34E-IR', 'retinaface_mnet025_v2+MobileFaceNet',
-     * 'retinaface_r50_v1+LResNet100E-IR', 'retinaface_r50_v1+LResNet50E-IR', 'retinaface_r50_v1+LResNet34E-IR',
-     * 'retinaface_r50_v1+MobileFaceNet' ]
+     * Default Deployment Machine Type
      */
     const deployInstanceType = 'ml.g4dn.xlarge';
-    const defaultDetectionModel = 'yolo3_darknet53_coco';
-    const defaultFaceComparisonModel = 'retinaface_mnet025_v2+MobileFaceNet';
 
 
     /**
@@ -103,10 +94,6 @@ export class IpcAiSaasStack extends cdk.Stack {
                 {
                     image: imageUrl.toString(),
                     mode: 'SingleModel',
-                    environment: {
-                        FACE_DETECTION_AND_COMPARISON_MODEL_NAME: defaultFaceComparisonModel,
-                        OBJECT_DETECTION_MODEL_NAME: defaultDetectionModel,
-                    }
                 }
             ],
         }

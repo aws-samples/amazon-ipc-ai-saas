@@ -6,7 +6,7 @@ import time
 from botocore import config
 
 
-solution_identifier = {"user_agent_extra": "AwsSolution/SO8016/2.0.0"}
+solution_identifier = {"user_agent_extra": "AwsSolution/SO8016/1.0.0"}
 config = config.Config(**solution_identifier)
 
 sagemaker_runtime_client = boto3.client('runtime.sagemaker', config=config)
