@@ -79,8 +79,8 @@ export class IpcAiSaasStack extends cdk.Stack {
 
     const imageUrl = cdk.Fn.conditionIf(
         'IsChinaRegionCondition',
-        `503146276818.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com.cn/ipc-ai-saas-${applicationType.valueAsString}-gpu:latest`,
-        `406855020396.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com/ipc-ai-saas-${applicationType.valueAsString}-gpu:latest`
+        `753680513547.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com.cn/ipc-ai-saas-${applicationType.valueAsString}-gpu:latest`,
+        `366590864501.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com/ipc-ai-saas-${applicationType.valueAsString}-gpu:latest`
     );
 
     // create model
