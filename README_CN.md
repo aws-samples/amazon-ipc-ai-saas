@@ -10,6 +10,7 @@
 * [实现细节](#实现细节)
   * [基于Darknet框架训练yolov4模型](#基于Darknet框架训练yolov4模型)
   * [TensorRT模型准备](#TensorRT模型准备)
+* [API调用代码示例](#API调用代码示例)
 * [并发测试](#并发测试)
 * [安全](#安全)
 * [许可](#许可)
@@ -199,6 +200,12 @@ python3 yolo_to_onnx.py -m yolov4-persons
 python3 onnx_to_tensorrt.py -m yolov4-persons --verbose
 ```
 执行完之后可以生成后缀为`.trt`的模型文件，该文件将会被封装成容器镜像供用户进行AI SaaS部署。
+
+
+
+## API调用代码示例
+
+
 
 ## 并发测试
 
