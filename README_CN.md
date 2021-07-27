@@ -64,17 +64,17 @@
 
 1. 登录AWS管理控制台，切换到您想将该解决方案部署到的区域；
 
-1. 点击下述按钮（中国与海外）来开启部署；
+1. 点击下述按钮（中国与海外）来开启部署，目前仅支持海外`us-east-1`区域和国内`cn-northwest-1`区域；
 
-    - **中国区域 (cn-north-1, cn-northwest-1)**
+    - **中国区域 (cn-northwest-1)**
 
     [![Launch Stack](launch-stack.svg)](https://console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=IPCSolutionStack&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/amazon-ipc-ai-saas/latest/IpcAiSaasStack.template)
 
-    - **标准（Standard）区域 (us-east-1, us-west-2)**
+    - **标准（Standard）区域 (us-east-1)**
 
-    [![Launch Stack](launch-stack.svg)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/template?stackName=IPCSolutionStack&templateURL=https://aws-gcr-solutions.s3.amazonaws.com/amazon-ipc-ai-saas/latest/IpcAiSaasStack.template)
+    [![Launch Stack](launch-stack.svg)](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/create/template?stackName=IPCSolutionStack&templateURL=https://sh-solutions-std.s3.amazonaws.com/ip-camera-ai-saas/v1.1.0/IpcAiSaasStack.template)
 
-1. 点击 **下一步**. 根据您需要可以更改堆栈名称；
+1. 点击 **下一步**. 根据您需要可以更改堆栈名称，选择`applicationType`和`saveRequestEvents`（启动`saveRequestEvents`会针对用户每一次调用存储输入图片和输入响应到S3桶，单帧耗时会稍微增加）；
 
 1. 点击 **下一步**. 配置堆栈选项 (可选)；
 
