@@ -10,17 +10,40 @@ import requests
 
 
 class DetectorSimulator(object):
-    def __init__(self, endpoint_url, test_images_dir):
+    def __init__(self, endpoint_url, application_type='PetsDetection'):
         self._endpoint_url = endpoint_url + 'inference'
-        self._test_images_dir = test_images_dir
+        self._application_type = application_type
 
-        self._cls_name_to_id_mapping = {
-            'pedestrian': 0,
-            'rider': 1,
-            'partially-visible person': 2,
-            'ignore region': 3,
-            'crowd': 4
-        }
+        if self._application_type == 'PetsDetection':
+            self._test_images_dir = './test_imgs/pets'
+            self._cls_name_to_id_mapping = {
+                'cat': 0,
+                'dog': 1
+            }
+            self._class_names_lut = ['cat', 'dog']
+        elif self._application_type == 'VehiclesDetection':
+            self._test_images_dir = './test_imgs/vehicles'
+            self._cls_name_to_id_mapping = {
+                'bicycle': 0,
+                'car': 1,
+                'motorcycle': 2,
+                'bus': 3,
+                'train': 4,
+                'truck': 5
+            }
+            self._class_names_lut = ['bicycle', 'car', 'motorcycle', 'bus', 'train', 'truck']
+        elif self._application_type == 'PersonsDetection':
+            self._test_images_dir = './test_imgs/persons'
+            self._cls_name_to_id_mapping = {
+                'pedestrian': 0,
+                'rider': 1,
+                'partially-visible person': 2,
+                'ignore region': 3,
+                'crowd': 4
+            }
+            self._class_names_lut = ['pedestrian', 'rider', 'partially-visible person', 'ignore region', 'crowd']
+        else:
+            print('Not supported application type.')
 
     @staticmethod
     def get_base64_encoding(full_path):
@@ -85,12 +108,12 @@ class DetectorSimulator(object):
                 np.array(bbox_coords),
                 np.array(bbox_scores),
                 np.array(cls_ids),
-                class_names=['pedestrian', 'rider', 'partially-visible person', 'ignore region', 'crowd'])
+                class_names=self._class_names_lut)
 
 
 if __name__ == '__main__':
     simulator = DetectorSimulator(
-        endpoint_url="https://1hdbtll8tl.execute-api.us-east-1.amazonaws.com/prod/",
-        test_images_dir='./test_imgs/persons/'
+        endpoint_url="https://hjym6va78a.execute-api.us-east-1.amazonaws.com/prod/",
+        application_type='VehiclesDetection'
     )
     simulator.run()
