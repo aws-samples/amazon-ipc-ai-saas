@@ -286,7 +286,9 @@ simulator = DetectorSimulator(
 ```
 
 调用后的可视化图如下所示：
-![persons_det_vis](./source/simulate/outputs/persons_det_res.png | width=100)
+![persons_det_vis](./source/simulate/outputs/persons_det_res.png)
+<img src="/source/simulate/outputs/persons_det_res.png"  width="120" height="120">
+
 ![pets_det_vis](./source/simulate/outputs/pets_det_res.png)
 ![vehicles_det_vis](./source/simulate/outputs/vehicles_det_res.png)
 
