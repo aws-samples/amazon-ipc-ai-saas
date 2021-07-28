@@ -68,7 +68,7 @@
 
     - **中国区域 (cn-northwest-1)**
 
-    [![Launch Stack](launch-stack.svg)](https://console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=IPCSolutionStack&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/amazon-ipc-ai-saas/latest/IpcAiSaasStack.template)
+    [![Launch Stack](launch-stack.svg)](https://console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=IPCSolutionStack&templateURL=https://sh-solutions-cn.s3.cn-northwest-1.amazonaws.com.cn/ip-camera-ai-saas/v1.1.0/IpcAiSaasStack.template)
 
     - **标准（Standard）区域 (us-east-1)**
 
