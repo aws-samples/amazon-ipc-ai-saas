@@ -286,12 +286,108 @@ simulator = DetectorSimulator(
 ```
 
 调用后的可视化图如下所示：
-<img src="/source/simulate/outputs/persons_det_res.png"  width="640" height="480" style="text-align:center">
-<img src="/source/simulate/outputs/pets_det_res.png"  width="640" height="480" style="text-align:center">
-<img src="/source/simulate/outputs/vehicles_det_res.png"  width="640" height="480" style="text-align:center">
+
+[comment]: <> (<img src="/source/simulate/outputs/persons_det_res.png"  width="640" height="480" style="text-align:center">)
+[comment]: <> (<img src="/source/simulate/outputs/pets_det_res.png"  width="640" height="480" style="text-align:center">)
+[comment]: <> (<img src="/source/simulate/outputs/vehicles_det_res.png"  width="640" height="480" style="text-align:center">)
+![persons_det_res](./source/simulate/outputs/persons_det_res.png)
+![pets_det_res](./source/simulate/outputs/pets_det_res.png)
+![vehicles_det_res](./source/simulate/outputs/vehicles_det_res.png)
+
 
 ## 并发测试
+该解决方案默认的部署的机型为`g4dn.xlarge`，配置单个`Nvidia T4 GPU`，由于端到端的访问时耗主要由网络传输延时和服务器端处理时间引起的，为了
+客观的得到服务器的并发能力，我们基于图像 [persons.jpg](./source/simulate/test_imgs/persons/persons.jpg) 进行并发测试，它的大小为`546x819x3`，
+在服务器端进行推理之前，首先需要将图像`resize`到固定的输入大小(`512x512`)，这个过程耗时与输入原始图像的尺寸紧密相关，越大的图像`resize`的时间越显著。
 
+#### 1. HTTP POST请求数据准备
+```angular2html
+import base64
+import json
+import time
+
+def get_base64_encoding(full_path):
+    with open(full_path, "rb") as f:
+        data = f.read()
+        image_base64_enc = base64.b64encode(data)
+        image_base64_enc = str(image_base64_enc, 'utf-8')
+
+    return image_base64_enc
+
+image_base64_enc = get_base64_encoding(full_path='your_test_image.jpg')
+
+# Step 2: send request to backend
+request_body = {
+    "timestamp": str(time.time()),
+    "request_id": 1242322,
+    "image_base64_enc": image_base64_enc
+}
+
+json.dump(request_body, open('post_data.txt', 'w'))
+```
+
+#### 2. EC2并发请求环境准备
+为了得到客观的服务器并发能力，避免网络传输延时的影响，我们配置一台同区域的EC2进行并发测试，如在`us-east-1`区
+选择`Amazon Linux 2 AMI (HVM), SSD Volume Type - ami-0c2b8ca1dad447f8a (64-bit x86) / ami-06cf15d6d096df5d2 (64-bit Arm)`
+系统镜像，机型选择`t3.small`，在EC2启动后，安装并发请求依赖项，如下所示：
+
+```angular2html
+sudo yum update
+sudo yum install -y httpd
+```
+
+
+#### 3. 并发请求
+```angular2html
+ab -p post_data.txt -T application/json -c 80 -n 1000 https://your_api_gateway_output_url/inference
+```
+参数`-c`表示每秒测试并发数，`-n`表示模拟的总请求数，测试结果如下所示：
+```angular2html
+Server Software:        
+Server Hostname:        lhz2shsh9i.execute-api.us-east-1.amazonaws.com
+Server Port:            443
+SSL/TLS Protocol:       TLSv1.2,ECDHE-RSA-AES128-GCM-SHA256,2048,128
+Server Temp Key:        ECDH P-256 256 bits
+TLS Server Name:        lhz2shsh9i.execute-api.us-east-1.amazonaws.com
+
+Document Path:          /prod/inference
+Document Length:        904 bytes
+
+Concurrency Level:      80
+Time taken for tests:   12.905 seconds
+Complete requests:      1000
+Failed requests:        6
+   (Connect: 0, Receive: 0, Length: 6, Exceptions: 0)
+Non-2xx responses:      6
+Total transferred:      1308970 bytes
+Total body sent:        277586000
+HTML transferred:       898792 bytes
+Requests per second:    77.49 [#/sec] (mean)
+Time per request:       1032.367 [ms] (mean)
+Time per request:       12.905 [ms] (mean, across all concurrent requests)
+Transfer rate:          99.06 [Kbytes/sec] received
+                        21006.49 kb/s sent
+                        21105.54 kb/s total
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        4   10  16.8      5      92
+Processing:    96  719 973.4    553   12724
+Waiting:       71  710 970.5    541   12689
+Total:        101  728 978.5    559   12804
+
+Percentage of the requests served within a certain time (ms)
+  50%    559
+  66%    710
+  75%    809
+  80%    899
+  90%   1132
+  95%   1339
+  98%   2785
+  99%   5570
+ 100%  12804 (longest request)
+```
+从结果可以看出，95%的请求在1.132秒内返回结果，每秒的并发数达到77.49。
 
 
 ## 安全
