@@ -113,7 +113,7 @@ class DetectorSimulator(object):
 
 if __name__ == '__main__':
     simulator = DetectorSimulator(
-        endpoint_url="https://hjym6va78a.execute-api.us-east-1.amazonaws.com/prod/",
-        application_type='VehiclesDetection'
+        endpoint_url="https://jwfaindhqi.execute-api.cn-northwest-1.amazonaws.com.cn/prod/",
+        application_type='PersonsDetection'
     )
     simulator.run()

@@ -87,50 +87,119 @@
 > 主要阐述如何训练Darknet yolov4目标检测模型，及如何将Darknet yolov4模型转化为TensorRT版本，该小节主要是为了
 获得目标检测的TensorRT模型，用来将其封装到ECS推理镜像中。
 
-#### 基于Darknet框架训练yolov4模型
-1. 在`Darknet`训练完`Yolo-v4`模型之后，我们需要将其转化为通用的`Tensorflow`模型，并进一步将`Tensorflow`模型
-   转化为TensorRT版本，这些转化过程以及最后的`TensorRT`推理需要依赖于`tensorflow-gpu`，`libnvinfer-dev=7.1.3-1+cuda11.0`等
-   一系列依赖库的安装，下述命令是基于Amazon EC2 g4dn.xlarge实例（Ubuntu 18.04 OS)的环境准备过程：
+### 基于Darknet框架训练yolov4模型
+#### 1. 训练环境准备
+在`Darknet`训练完`Yolo-v4`模型之后，我们需要将其转化为通用的`Tensorflow`模型，并进一步将`Tensorflow`模型
+转化为TensorRT版本，这些转化过程以及最后的`TensorRT`推理需要依赖于`tensorflow-gpu`，`libnvinfer-dev=7.1.3-1+cuda11.0`等
+一系列依赖库的安装，下述命令是基于Amazon EC2 g4dn.xlarge实例（Ubuntu 18.04 OS)的环境准备过程：
 
-    ```angular2html
-    sudo apt-get update
-    sudo apt-get install -y git cmake awscli libopencv-dev python3-pip
-    python3 -m pip install --upgrade pip
-    
-    # install tensorflow-gpu (SHOULD BE VERSION 2.4.0), it matches cuda/cudnn/nvinfer7 versions
-    pip3 install tensorflow-gpu==2.4.0
-    pip3 install opencv-python==4.5.2.54
-    pip3 install easydict==1.9
-    
-    # add NVIDIA package repositories
-    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
-    sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
-    sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
-    sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/ /"
-    sudo apt-get update
-    
-    wget http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/nvidia-machine-learning-repo-ubuntu1804_1.0.0-1_amd64.deb
-    sudo apt install ./nvidia-machine-learning-repo-ubuntu1804_1.0.0-1_amd64.deb
-    sudo apt-get update
-    
-    wget https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/libnvinfer7_7.1.3-1+cuda11.0_amd64.deb
-    sudo apt install -y ./libnvinfer7_7.1.3-1+cuda11.0_amd64.deb
-    sudo apt-get update
-    
-    # install development and runtime libraries (~4GB)
-    sudo apt-get install -y --no-install-recommends cuda-11-0 libcudnn8=8.0.4.30-1+cuda11.0 libcudnn8-dev=8.0.4.30-1+cuda11.0 --allow-downgrades
-    
-    # reboot and check GPUs are visible using command: nvidia-smi
-    
-    # install TensorRT, which requires that libcudnn8 is installed above
-    sudo apt-get install -y --no-install-recommends libnvinfer7=7.1.3-1+cuda11.0 libnvinfer-dev=7.1.3-1+cuda11.0 libnvinfer-plugin7=7.1.3-1+cuda11.0
+```angular2html
+sudo apt-get update
+sudo apt-get install -y git cmake awscli libopencv-dev python3-pip
+python3 -m pip install --upgrade pip
 
-    export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}
-    export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}} 
-    ```
+# install tensorflow-gpu (SHOULD BE VERSION 2.4.0), it matches cuda/cudnn/nvinfer7 versions
+pip3 install tensorflow-gpu==2.4.0
+pip3 install opencv-python==4.5.2.54
+pip3 install easydict==1.9
+
+# add NVIDIA package repositories
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
+sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
+sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+sudo add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/ /"
+sudo apt-get update
+
+wget http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/nvidia-machine-learning-repo-ubuntu1804_1.0.0-1_amd64.deb
+sudo apt install ./nvidia-machine-learning-repo-ubuntu1804_1.0.0-1_amd64.deb
+sudo apt-get update
+
+wget https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/libnvinfer7_7.1.3-1+cuda11.0_amd64.deb
+sudo apt install -y ./libnvinfer7_7.1.3-1+cuda11.0_amd64.deb
+sudo apt-get update
+
+# install development and runtime libraries (~4GB)
+sudo apt-get install -y --no-install-recommends cuda-11-0 libcudnn8=8.0.4.30-1+cuda11.0 libcudnn8-dev=8.0.4.30-1+cuda11.0 --allow-downgrades
+
+# reboot and check GPUs are visible using command: nvidia-smi
+
+# install TensorRT, which requires that libcudnn8 is installed above
+sudo apt-get install -y --no-install-recommends libnvinfer7=7.1.3-1+cuda11.0 libnvinfer-dev=7.1.3-1+cuda11.0 libnvinfer-plugin7=7.1.3-1+cuda11.0
+
+echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc 
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
+```
 
 
-#### TensorRT模型准备
+#### 2. `Darknet`编译
+安装`Darknet`环境，将`Darknet Yolov4`克隆到本地目录：
+```angular2html
+git clone https://github.com/AlexeyAB/darknet.git
+```
+更改编译选项`Makefile`，使其支持`GPU`训练，如下所示：
+```angular2html
+GPU=1
+CUDNN=1
+CUDNN_HALF=1
+OPENCV=1
+AVX=1
+OPENMP=1
+LIBSO=1
+ZED_CAMERA=0
+ZED_CAMERA_v2_8=0
+```
+开始编译`darknet`，命令如下：
+```angular2html
+cd darknet
+make -j4
+```
+编译成功会生成一个可执行文件，如下所示：
+```angular2html
+ubuntu@ip-11-0-1-195:~/darknet$ ls -al darknet
+-rwxrwxr-x 1 ubuntu ubuntu 6705768 Jul 14 03:56 darknet
+```
+
+#### 3. 创建`Darknet`训练配置文件
+以宠物检测为例，共有两个检测类别（猫，狗），我们配置目标检测类别为`2`的配置文件：
+```angular2html
+cd darknet/cfg/
+cp yolov4-custom.cfg yolov4-pets.cfg
+
+# 更改配置，输入宽高改为512；max_batches改为10000；steps改为max_batches的0.8，0.9倍；
+# classes改为2（不含背景类）；filters=255改为filters=(classes + 5)x3)
+vi yolov4-pets.cfg  
+
+cd ../data/
+vi pets.names  # 输入第一行cat，第二行dog保存
+vi pets.data   # 输入配置选项
+cat pets.data 
+
+# cat pets.data输出如下：
+# classes = 2
+# train  = data/pets/train.txt
+# valid  = data/pets/val.txt
+# names = data/pets.names
+# backup = backup/
+
+# 下载训练数据
+aws s3 cp s3://ip-camera-ai-saas/dataset/pets-detect/pets.zip .
+unzip pets.zip
+
+# 下载pre-trained模型
+cd ../
+mkdir models
+cd models/
+wget -c https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.conv.137
+```
+
+#### 4. 启动训练
+执行如下脚本启动后台训练：
+```angular2html
+nohup ./darknet detector train data/pets.data cfg/yolov4-pets.cfg models/yolov4.conv.137 -dont_show -mjpeg_port 8090 -map 2>&1 > train.log &
+```
+   
+### TensorRT模型准备
 
 #### 1. CUDA_11.1 + CUDNN_8 + TensorRT_7.2.3 推理环境安装
 
@@ -204,7 +273,22 @@ python3 onnx_to_tensorrt.py -m yolov4-persons --verbose
 
 
 ## API调用代码示例
+在用户部署完该解决方案后，可以采用 [simulate_request.py](./source/simulate/simulate_request.py) 进行调用测试并可视化，
+用户需要在调用的主函数中将`endpoint_url`配置为自己账号中部署好的`API Gateway Url`（在`Cloudformation`中部署
+的解决方案控制台标签页`outputs`中），将`application_type`配置为`PersonsDetection`，`PetsDetection`和
+`VehiclesDetection`三个中的任意一个即可。
 
+```angular2html
+simulator = DetectorSimulator(
+    endpoint_url="https://your_invoke_url_endpoint",
+    application_type='VehiclesDetection'
+)
+```
+
+调用后的可视化图如下所示：
+![persons_det_vis](./source/simulate/outputs/persons_det_res.png | width=100)
+![pets_det_vis](./source/simulate/outputs/pets_det_res.png)
+![vehicles_det_vis](./source/simulate/outputs/vehicles_det_res.png)
 
 
 ## 并发测试
