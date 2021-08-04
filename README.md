@@ -110,9 +110,9 @@ cdk deploy \
 > Note: You can simply run `cdk destroy` if the solution task is no longer required. This command will remove the stack created by this solution from your AWS account.
 
 
-## LICENSE
+## Security
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
 
-## LICENSE
+## License
 See the [LICENSE](LICENSE) file for our project's licensing. We will ask you to confirm the licensing of your contribution.
 
