@@ -1,54 +1,69 @@
 import * as cdk from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
+import * as dynamodb from '@aws-cdk/aws-dynamodb';
 import * as agw from '@aws-cdk/aws-apigateway';
-import * as iam from '@aws-cdk/aws-iam';
 import * as s3 from '@aws-cdk/aws-s3';
-import * as sagemaker from '@aws-cdk/aws-sagemaker';
+import {SageMakerRuntimeEndpoint}  from "./sagemaker"
+import {LambdaHandlers} from "./lambda"
 
 
 export class IpcAiSaasStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
-    this.templateOptions.description = '(SO8016) - IP Camera AI SaaS Service Stack. Template version v1.0.0';
-
+    this.templateOptions.description = '(SO8016) - IP Camera AI SaaS Service Stack (Face Recognition). Template version v1.0.0';
 
     /**
-     * User Parameters Configuration: Depends on User's Selection
+     * Deployment Instance Type Selection
      */
-    const applicationType = new cdk.CfnParameter(this, 'applicationType', {
-        description: 'Please choose your desired service type',
+    const deployInstanceType = new cdk.CfnParameter(this, 'deployInstanceType', {
+        description: 'Please choose your desired deployment instance type',
         type: 'String',
-        default: 'persons-detection',
+        default: 'ml.g4dn.xlarge',
         allowedValues: [
-            'persons-detection',
-            'pets-detection',
-            'vehicles-detection'
+            'ml.g4dn.xlarge',
         ]
     });
 
-    const saveRequestEvents = new cdk.CfnParameter(this, 'saveRequestEvents', {
-        description: 'Whether to save all request images and corresponding response for close-loop improvement',
+    const faceDetectorModel = new cdk.CfnParameter(this, 'faceDetectorModel', {
+        description: 'Please choose your desired face detector model',
         type: 'String',
-        default: 'No',
+        default: 'retinaface_mnet025_v2',
         allowedValues: [
-            'Yes',
-            'No',
+            'retinaface_r50_v1',
+            'retinaface_mnet025_v2'
+        ]
+    });
+
+    const faceRepresenterModel = new cdk.CfnParameter(this, 'faceRepresenterModel', {
+        description: 'Please choose your desired face representation model',
+        type: 'String',
+        default: 'MobileFaceNet',
+        allowedValues: [
+            'MobileFaceNet',
+            'LResNet34E-IR',
+            'LResNet50E-IR',
+            'LResNet100E-IR'
         ]
     });
 
 
-    /**
-     * Default Deployment Machine Type
-     */
-    const deployInstanceType = 'ml.g4dn.xlarge';
+    const faceConfidenceThreshold = new cdk.CfnParameter(this, 'faceConfidenceThreshold', {
+        description: 'Please configure the confidence threshold of faces (only faces above this threshold will be further represented)',
+        type: 'String',
+        default: '0.70',
+        allowedValues: [
+            '0.70',
+            '0.80',
+            '0.90'
+        ]
+    });
 
 
     /**
      * S3 Bucket Provision
      */
-    const events = new s3.Bucket(
+    const imageAssets = new s3.Bucket(
         this,
-        'events',
+        'imageAssets',
         {
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
@@ -57,113 +72,62 @@ export class IpcAiSaasStack extends cdk.Stack {
 
 
     /**
-     * Sagemaker Model/Endpoint Configuration/Endpoint Provision
+     * DynamoDB Provision
      */
-    const sagemakerExecuteRole = new iam.Role(
+    const faces = new dynamodb.Table(
         this,
-        'sagemakerExecuteRole',
+        'faces',
         {
-            roleName: `ipc-ai-saas-${applicationType.valueAsString}-sagemaker-execution-role`,
-            assumedBy: new iam.ServicePrincipal('sagemaker.amazonaws.com'),
-            managedPolicies: [
-                iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'),
-                iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2ContainerRegistryFullAccess'),
-                iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchLogsFullAccess'),
-            ]
-        }
-    );
-
-    new cdk.CfnCondition(this,
-        'IsChinaRegionCondition',
-        { expression: cdk.Fn.conditionEquals(cdk.Aws.PARTITION, 'aws-cn')});
-
-    const imageUrl = cdk.Fn.conditionIf(
-        'IsChinaRegionCondition',
-        `753680513547.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com.cn/ipc-ai-saas-${applicationType.valueAsString}-gpu:latest`,
-        `366590864501.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com/ipc-ai-saas-${applicationType.valueAsString}-gpu:latest`
-    );
-
-    // create model
-    const sagemakerEndpointModel = new sagemaker.CfnModel(
-        this,
-        'sagemakerEndpointModel',
-        {
-            modelName: `ipc-ai-saas-${applicationType.valueAsString}-endpoint-model`,
-            executionRoleArn: sagemakerExecuteRole.roleArn,
-            containers: [
-                {
-                    image: imageUrl.toString(),
-                    mode: 'SingleModel',
-                }
-            ],
-        }
-    );
-
-    // create endpoint configuration
-    const sagemakerEndpointConfig = new sagemaker.CfnEndpointConfig(
-        this,
-        'sagemakerEndpointConfig',
-        {
-            endpointConfigName: `ipc-ai-saas-${applicationType.valueAsString}-endpoint-config`,
-            productionVariants: [{
-                initialInstanceCount: 1,
-                initialVariantWeight: 1,
-                instanceType: deployInstanceType,
-                modelName: sagemakerEndpointModel.attrModelName,
-                variantName: 'AllTraffic',
-            }]
-        }
-    );
-
-    // create endpoint
-    const sagemakerEndpoint = new sagemaker.CfnEndpoint(
-        this,
-        'sagemakerEndpoint',
-        {
-            endpointName: `ipc-ai-saas-${applicationType.valueAsString}-endpoint`,
-            endpointConfigName: sagemakerEndpointConfig.attrEndpointConfigName
+            partitionKey: {
+                name: 'activity_id',
+                type: dynamodb.AttributeType.STRING
+            },
+            sortKey: {
+                name: 'image_id',
+                type: dynamodb.AttributeType.STRING
+            },
+            tableName: 'faces',
+            billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
         }
     );
 
 
     /**
-     * Lambda Function & API Gateway Provision
+     * Create SageMaker runtime endpoint with auto-scaling enabled.
      */
-    const lambdaAccessPolicy = new iam.PolicyStatement({
-        effect: iam.Effect.ALLOW,
-        actions: [
-            "sagemaker:InvokeEndpoint",
-            "s3:GetObject",
-            "s3:PutObject",
-        ],
-        resources: ["*"]
-    });
-    lambdaAccessPolicy.addAllResources();
-
-    // lambda function provision
-    const ipcSaaSHandler = new lambda.Function(
+    const sagemakerStack = new SageMakerRuntimeEndpoint(
         this,
-        'ipcSaaSHandler',
+        'sagemakerStack',
         {
-            functionName: `ipcSaaSHandler-${applicationType.valueAsString}`,
-            code: new lambda.AssetCode( 'lambda'),
-            handler: 'main.handler',
-            runtime: lambda.Runtime.PYTHON_3_8,
-            environment: {
-                SAGEMAKER_ENDPOINT_NAME: sagemakerEndpoint.attrEndpointName,
-                EVENTS_S3_BUCKET_NAME: events.bucketName,
-                REQUEST_EVENTS_SNAPSHOT_ENABLED: `${saveRequestEvents.valueAsString}`,
-            },
-            timeout: cdk.Duration.minutes(10),
-            memorySize: 512,
+            deployInstanceType: deployInstanceType.valueAsString,
+            faceDetectorModel: faceDetectorModel.valueAsString,
+            faceRepresenterModel: faceRepresenterModel.valueAsString,
+            faceConfidenceThreshold: faceConfidenceThreshold.valueAsNumber
         }
     );
-    ipcSaaSHandler.addToRolePolicy(lambdaAccessPolicy);
 
-    // api gateway provision
-    const apiRouter = new agw.RestApi(
+
+    /**
+     * Create Lambda Functions
+     */
+    const lambdaStack = new LambdaHandlers(
         this,
-        'apiRouter',
+        'lambdaStack',
+        {
+            imageAssets: imageAssets,
+            facesTableName: faces.tableName,
+            sagemakerInferenceEndpointName: sagemakerStack.faceRecgnitionEndpointName,
+        }
+    );
+
+
+    /**
+     * Create API Gateway
+     */
+    const faceRecognitionAPIRouter = new agw.RestApi(
+        this,
+        'faceRecognitionAPIRouter',
         {
             endpointConfiguration: {
                 types: [agw.EndpointType.REGIONAL]
@@ -174,7 +138,9 @@ export class IpcAiSaasStack extends cdk.Stack {
             }
         }
     );
-    apiRouter.root.addResource('inference').addMethod('POST', new agw.LambdaIntegration(ipcSaaSHandler));
+    faceRecognitionAPIRouter.root.addResource('upload').addMethod('POST', new agw.LambdaIntegration(lambdaStack.imageUploader));
+    faceRecognitionAPIRouter.root.addResource('activity').addMethod('POST', new agw.LambdaIntegration(lambdaStack.activitySummary));
+    faceRecognitionAPIRouter.root.addResource('query').addMethod('POST', new agw.LambdaIntegration(lambdaStack.faceQuery));
 
   }
 }

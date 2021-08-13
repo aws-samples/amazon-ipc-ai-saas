@@ -31,58 +31,18 @@ aws ecr get-login-password --region ${REGION} | docker login --username AWS --pa
 
 
 #############################################################################################
-###                      Persons Detection Image Build & Push                             ###
-#############################################################################################
-echo "------------------------------------------------------------------------------"
-echo "[Build] Build Person Detection Image (GPU Version)                            "
-echo "------------------------------------------------------------------------------"
-cd ${SOURCE_DIR}
-IMAGE_NAME=ipc-ai-saas-persons-detection-gpu
-docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f containers/persons-detection/Dockerfile containers/persons-detection/
-docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
-
-echo "------------------------------------------------------------------------------"
-echo "[Push] Push Person Detection Image (GPU Version)                              "
-echo "------------------------------------------------------------------------------"
-cd ${SOURCE_DIR}
-aws ecr create-repository --repository-name ${IMAGE_NAME} --region ${REGION} >/dev/null 2>&1
-docker push ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
-
-
-
-#############################################################################################
-###                        Pets Detection Image Build & Push                              ###
-#############################################################################################
-echo "------------------------------------------------------------------------------"
-echo "[Build] Build Pets (Cat/Dog) Detection Image (GPU Version)                    "
-echo "------------------------------------------------------------------------------"
-cd ${SOURCE_DIR}
-IMAGE_NAME=ipc-ai-saas-pets-detection-gpu
-docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f containers/pets-detection/Dockerfile containers/pets-detection/
-docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
-
-echo "------------------------------------------------------------------------------"
-echo "[Push] Push Pets (Cat/Dog) Detection Image (GPU Version)                      "
-echo "------------------------------------------------------------------------------"
-cd ${SOURCE_DIR}
-aws ecr create-repository --repository-name ${IMAGE_NAME} --region ${REGION} >/dev/null 2>&1
-docker push ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
-
-
-
-#############################################################################################
 ###                        Vehicles Detection Image Build & Push                          ###
 #############################################################################################
 echo "------------------------------------------------------------------------------"
-echo "[Build] Build Vehicles Detection Image (GPU Version)                    "
+echo "[Build] Build Face Recognition Image (GPU Version)                            "
 echo "------------------------------------------------------------------------------"
 cd ${SOURCE_DIR}
-IMAGE_NAME=ipc-ai-saas-vehicles-detection-gpu
-docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f containers/vehicles-detection/Dockerfile containers/vehicles-detection/
+IMAGE_NAME=ipc-ai-saas-face-recognition-gpu
+docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f containers/faces/Dockerfile containers/faces/
 docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
 
 echo "------------------------------------------------------------------------------"
-echo "[Push] Push Vehicles Detection Image (GPU Version)                      "
+echo "[Push] Push Face Recognition Image (GPU Version)                              "
 echo "------------------------------------------------------------------------------"
 cd ${SOURCE_DIR}
 aws ecr create-repository --repository-name ${IMAGE_NAME} --region ${REGION} >/dev/null 2>&1
