@@ -103,7 +103,7 @@ export class IpcAiSaasStack extends cdk.Stack {
             deployInstanceType: deployInstanceType.valueAsString,
             faceDetectorModel: faceDetectorModel.valueAsString,
             faceRepresenterModel: faceRepresenterModel.valueAsString,
-            faceConfidenceThreshold: faceConfidenceThreshold.valueAsNumber
+            faceConfidenceThreshold: faceConfidenceThreshold.valueAsString
         }
     );
 

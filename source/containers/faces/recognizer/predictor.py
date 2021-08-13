@@ -20,7 +20,11 @@ FACE_DETECTOR_MODEL = os.environ.get("FACE_DETECTOR_MODEL", "retinaface_mnet025_
 # options = ["MobileFaceNet", "LResNet34E-IR", "LResNet50E-IR", "LResNet100E-IR"]
 FACE_REPRESENT_MODEL = os.environ.get("FACE_REPRESENT_MODEL", "MobileFaceNet")
 
-FACE_CONFIDENCE_THRESHOLD = os.environ.get("FACE_CONFIDENCE_THRESHOLD", 0.70)
+FACE_CONFIDENCE_THRESHOLD = float(os.environ.get("FACE_CONFIDENCE_THRESHOLD", "0.70"))
+
+print('FACE_DETECTOR_MODEL = {}'.format(FACE_DETECTOR_MODEL))
+print('FACE_REPRESENT_MODEL = {}'.format(FACE_REPRESENT_MODEL))
+print('FACE_CONFIDENCE_THRESHOLD = {}'.format(FACE_CONFIDENCE_THRESHOLD))
 
 
 # A singleton for holding the model. This simply loads the model and holds it.

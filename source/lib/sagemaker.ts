@@ -9,7 +9,7 @@ export interface SageMakerRuntimeEndpointProps {
     readonly deployInstanceType: string,
     readonly faceDetectorModel: string,
     readonly faceRepresenterModel: string,
-    readonly faceConfidenceThreshold: number,
+    readonly faceConfidenceThreshold: string,
 }
 
 
