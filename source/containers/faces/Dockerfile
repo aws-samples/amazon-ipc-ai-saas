@@ -29,7 +29,7 @@ ENV PYTHONDONTWRITEBYTECODE=TRUE
 ENV PATH="/opt/program:${PATH}"
 
 # Set up the program in the image
-COPY face_detect_and_represent /opt/program
+COPY recognizer /opt/program
 RUN chmod +x /opt/program/serve
 WORKDIR /opt/program
 

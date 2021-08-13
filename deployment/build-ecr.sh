@@ -52,7 +52,7 @@ echo "[Build] Build Face Recognition Image (GPU Version)                        
 echo "------------------------------------------------------------------------------"
 cd ${SOURCE_DIR}
 IMAGE_NAME=ipc-ai-saas-face-recognition-gpu
-docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f containers/faces/Dockerfile containers/face_detect_and_represent/ --build-arg REGISTRY_URI=${REGISTRY_URI_GPU}
+docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f containers/faces/Dockerfile containers/faces/ --build-arg REGISTRY_URI=${REGISTRY_URI_GPU}
 docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DOMAIN}/${IMAGE_NAME}:${IMAGE_TAG}
 
 echo "------------------------------------------------------------------------------"
