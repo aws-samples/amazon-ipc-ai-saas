@@ -37,21 +37,9 @@ export class SageMakerRuntimeEndpoint extends Construct {
 
 
         /**
-         * Create Image URL Configuration for Different Regions
-         */
-        new cdk.CfnCondition(this,  'IsChinaRegionCondition',
-            { expression: cdk.Fn.conditionEquals(cdk.Aws.PARTITION, 'aws-cn')});
-
-        const imageUrl = cdk.Fn.conditionIf(
-            'IsChinaRegionCondition',
-            `503146276818.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com.cn/ipc-ai-saas-face-recognition-gpu:latest`,
-            `406855020396.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com/ipc-ai-saas-face-recognition-gpu:latest`
-        );
-
-
-        /**
          * Create Runtime Inference Model/Model Configuration/Endpoint
          */
+        const imageUrl = `503146276818.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com.cn/ipc-ai-saas-face-recognition-gpu:latest`;
         const faceRecognitionInferenceModel = new sagemaker.CfnModel(
             this,
             'faceRecognitionInferenceModel',
