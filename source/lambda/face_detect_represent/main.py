@@ -2,6 +2,7 @@ import boto3
 import os
 import json
 import base64
+import uuid
 import time
 from botocore import config
 
@@ -24,11 +25,15 @@ def get_base64_encoding(full_path):
 
 
 def handler(event, context):
+    ret_body = 'success'
     dynamodb_table_name = os.environ['DYNAMODB_TABLE_NAME']
     image_assets_bucket_name = os.environ['IMAGE_ASSETS_BUCKET_NAME']
     sagemaker_endpoint_name = os.environ['SAGEMAKER_ENDPOINT_NAME']
 
-    # download the upload image into local disk
+
+    #--------------------------------------------------------------------------------------------#
+    #------              Step 1: Download Image From S3 Bucket to Local Path             --------#
+    #--------------------------------------------------------------------------------------------#
     s3_key = event['Records'][0]['s3']['object']['key']
     activity_id = s3_key.split('/')[0]
     image_name = s3_key.split('/')[1]
@@ -42,10 +47,11 @@ def handler(event, context):
         s3.download_fileobj(image_assets_bucket_name, s3_key, wf)
     print('Successfully download {} to {}'.format(image_name, local_image_path))
 
-    ret_body = 'success'
 
-    # invoke SageMaker inference endpoint to perform face detection and representation
-    face_meta_data = sagemaker_runtime_client.invoke_endpoint(
+    #--------------------------------------------------------------------------------------------#
+    #------                 Step 2: Faces Detection & Representation                     --------#
+    #--------------------------------------------------------------------------------------------#
+    all_faces_in_image = sagemaker_runtime_client.invoke_endpoint(
         EndpointName=sagemaker_endpoint_name,
         ContentType='application/json',
         Accept='application/json',
@@ -53,21 +59,43 @@ def handler(event, context):
             'image_bytes': get_base64_encoding(local_image_path)
         }),
     )
-    faces_list_str = face_meta_data['Body'].read().decode()
-    print("Faces Response = {}".format(faces_list))
+    all_faces_str = all_faces_in_image['Body'].read().decode()
+    print("Faces Response = {}".format(all_faces_str))
 
-    # save face meta data into DynamoDB table
-    face_record = {
-        'activity_id': {'S': activity_id},
-        'image_id': {'S': image_id},
-        'faces': {'S': faces_list_str},
-    }
 
-    ddb_put_response = dynamodb.put_item(
-        TableName=dynamodb_table_name,
-        Item=face_record
-    )
-    print("Write DynamoDB Response = {}".format(ddb_put_response))
+    #--------------------------------------------------------------------------------------------#
+    #------                    Step 3: Write Each Face into DynamoDB Table               --------#
+    #--------------------------------------------------------------------------------------------#
+    all_faces = json.loads(all_faces_str)
+    image_height = all_faces.get("image_height", -1)
+    image_width = all_faces.get("image_width", -1)
+    image_channels = all_faces.get("image_channels", -1)
+    faces = all_faces.get("faces", list())
+
+    for index, detected_face in enumerate(faces):
+        bbox = detected_face['bbox']
+        confidence = detected_face['confidence']
+        landmarks = detected_face['landmarks']
+        representation = detected_face['representation']
+
+        face_record = {
+            "activity_id": {'S': "test_12132"},
+            "image_id": {'S': "VID_123"},
+            "face_id": {'S': str(uuid.uuid4())},
+            "image_width": {'N': "1126"},
+            "image_height": {'N': "720"},
+            "image_channels": {'N': "3"},
+            "bbox": {'NS': [str(x) for x in bbox]},
+            "confidence": {'N': str(confidence)},
+            "left_mouth": {'NS': [str(x) for x in landmarks["mouthLeft"]]},
+            "right_mouth": {'NS': [str(x) for x in landmarks["mouthRight"]]},
+            "left_eye": {'NS': [str(x) for x in landmarks["eyeLeft"]]},
+            "right_eye": {'NS': [str(x) for x in landmarks["eyeRight"]]},
+            "nose": {'NS': [str(x) for x in landmarks["nose"]]},
+            "representation": {'NS': [str(x) for x in representation]}
+        }
+
+        print("Write face {} / {} into DynamoDB table {}...".format(index + 1, len(faces), dynamodb_table_name))
 
     # return response
     response = {
