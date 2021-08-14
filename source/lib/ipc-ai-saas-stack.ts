@@ -83,7 +83,7 @@ export class IpcAiSaasStack extends cdk.Stack {
                 type: dynamodb.AttributeType.STRING
             },
             sortKey: {
-                name: 'image_id',
+                name: 'face_id',
                 type: dynamodb.AttributeType.STRING
             },
             tableName: 'faces',

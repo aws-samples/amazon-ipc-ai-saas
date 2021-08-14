@@ -30,6 +30,7 @@
     "@aws-cdk/aws-iam": "^1.118.0",
     "@aws-cdk/aws-lambda": "^1.118.0",
     "@aws-cdk/aws-lambda-event-sources": "^1.118.0",
+    "@aws-cdk/aws-lambda-python": "^1.118.0",
     "@aws-cdk/aws-s3": "^1.118.0",
     "@aws-cdk/aws-sagemaker": "^1.118.0",
     "@aws-cdk/core": "1.118.0",
