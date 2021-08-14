@@ -60,7 +60,7 @@ export class LambdaHandlers extends Construct {
                 },
                 timeout: cdk.Duration.minutes(10),
                 role: faceRecognitionLambdaRole,
-                memorySize: 512,
+                memorySize: 1024,
             }
         );
 
@@ -83,7 +83,7 @@ export class LambdaHandlers extends Construct {
                 },
                 timeout: cdk.Duration.minutes(10),
                 role: faceRecognitionLambdaRole,
-                memorySize: 512,
+                memorySize: 8196,
             }
         );
 
@@ -124,7 +124,7 @@ export class LambdaHandlers extends Construct {
                 },
                 role: faceRecognitionLambdaRole,
                 timeout: cdk.Duration.minutes(10),
-                memorySize: 40960,
+                memorySize: 8196,
             }
         );
 
@@ -146,7 +146,7 @@ export class LambdaHandlers extends Construct {
         //         },
         //         timeout: cdk.Duration.minutes(10),
         //         role: faceRecognitionLambdaRole,
-        //         memorySize: 40960,
+        //         memorySize: 8196,
         //     }
         // );
 
@@ -164,7 +164,7 @@ export class LambdaHandlers extends Construct {
                 },
                 timeout: cdk.Duration.minutes(10),
                 role: faceRecognitionLambdaRole,
-                memorySize: 40960,
+                memorySize: 8196,
             }
         );
 
