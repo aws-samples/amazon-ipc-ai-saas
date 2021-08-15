@@ -2,10 +2,11 @@ import boto3
 import os
 import json
 import numpy as np
-# from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
-from sklearn.cluster import DBSCAN
 import time
 from botocore import config
+import warnings
+# from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
+from sklearn.cluster import DBSCAN
 
 
 solution_identifier = {"user_agent_extra": "AwsSolution/SO8016/1.0.0"}
@@ -79,29 +80,20 @@ def handler(event, context):
     if len(faces) == 0:
         ret_body = "faces library empty"
     else:
-        print('Len(faces) = {}'.format(len(faces)))
-        print('faces[0] = {}'.format(faces[0]))
-        print('type(faces[0]) = {}'.format(type(faces[0])))
-
+        print('# of faces in library = {}'.format(len(faces)))
         t_cluster_start = time.time()
         face_feats = list()
         face_info = list()
         for index, face in enumerate(faces):
-            face_feats.append(face['representation'])
+            face_feats.append(json.loads(face['representation']['S']))
             face_info.append(
                 {
-                    'activity_id': face['activity_id'],
-                    'image_id': face['image_id'],
-                    'face_id': face['face_id'],
-                    'bbox': face['bbox'],
-                    'confidence': face['confidence'],
-                    'landmarks': {
-                        "left_eye": face['left_eye'],
-                        "right_eye": face['right_eye'],
-                        "nose": face['nose'],
-                        "left_mouth": face['left_mouth'],
-                        "right_mouth": face['right_mouth']
-                    },
+                    'activity_id': face['activity_id']['S'],
+                    'image_id': face['image_id']['S'],
+                    'face_id': face['face_id']['S'],
+                    'bbox': json.loads(face['bbox']['S']),
+                    'confidence': float(face['confidence']['N']),
+                    'landmarks': json.loads(face['landmarks']['S'])
                 }
             )
 
@@ -114,7 +106,7 @@ def handler(event, context):
         print('cosine_cluster_labels = {}'.format(cosine_cluster_labels))
         print('len(list(set(cosine_cluster_labels))) = {}'.format(len(list(set(cosine_cluster_labels)))))
         t_cluster_end = time.time()
-        print('Clustering Time Cost = {}'.format(1000.0 * (t_cluster_end - t_cluster_start)))
+        print('Clustering Time Cost = {} ms'.format(1000.0 * (t_cluster_end - t_cluster_start)))
 
         # # clustering based on euclidean distance
         # norm_vector = np.linalg.norm(face_feats, axis=-1)
@@ -127,9 +119,9 @@ def handler(event, context):
 
         for index, label in enumerate(cosine_cluster_labels):
             if label in faces_cluster.keys():
-                faces_cluster[label].append(face_info[index])
+                faces_cluster[int(label)].append(face_info[index])
             else:
-                faces_cluster[label] = [face_info[index]]
+                faces_cluster[int(label)] = [face_info[index]]
 
         ret_body = json.dumps(faces_cluster)
 

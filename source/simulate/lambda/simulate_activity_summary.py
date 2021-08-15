@@ -23,7 +23,7 @@ class ActivitySummaryDemo(object):
 
 if __name__ == '__main__':
     demo = ActivitySummaryDemo(
-        request_url="https://keoytrh4u1.execute-api.cn-northwest-1.amazonaws.com.cn/prod/activity",
+        request_url="https://8bfha86lq8.execute-api.cn-northwest-1.amazonaws.com.cn/prod/activity",
         activity_id="Activity_2021_08_29_BJ001"
     )
     demo.run()

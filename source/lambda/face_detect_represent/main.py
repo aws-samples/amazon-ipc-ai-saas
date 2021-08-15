@@ -82,14 +82,10 @@ def handler(event, context):
             "image_width": {'N': str(image_width)},
             "image_height": {'N': str(image_height)},
             "image_channels": {'N': str(image_channels)},
-            "bbox": {'NS': [str(x) for x in bbox]},
+            "bbox": {'S': json.dumps(bbox)},
             "confidence": {'N': str(confidence)},
-            "left_mouth": {'NS': [str(x) for x in landmarks["mouthLeft"]]},
-            "right_mouth": {'NS': [str(x) for x in landmarks["mouthRight"]]},
-            "left_eye": {'NS': [str(x) for x in landmarks["eyeLeft"]]},
-            "right_eye": {'NS': [str(x) for x in landmarks["eyeRight"]]},
-            "nose": {'NS': [str(x) for x in landmarks["nose"]]},
-            "representation": {'NS': [str(x) for x in representation]}
+            "landmarks": {'S': json.dumps(landmarks)},
+            "representation": {'S': json.dumps(representation)}
         }
 
         # write into DynamoDB table

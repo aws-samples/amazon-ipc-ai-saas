@@ -1,7 +1,6 @@
 import { Construct } from "@aws-cdk/core";
 import * as iam from "@aws-cdk/aws-iam";
 import * as lambda from "@aws-cdk/aws-lambda";
-import { PythonFunction } from "@aws-cdk/aws-lambda-python";
 import * as cdk from "@aws-cdk/core";
 import {S3EventSource} from "@aws-cdk/aws-lambda-event-sources";
 import * as s3 from '@aws-cdk/aws-s3';
@@ -54,7 +53,7 @@ export class LambdaHandlers extends Construct {
             {
                 code: new lambda.AssetCode('lambda/image_uploader'),
                 handler: 'main.handler',
-                runtime: lambda.Runtime.PYTHON_3_8,
+                runtime: lambda.Runtime.PYTHON_3_6,
                 environment: {
                     IMAGE_ASSETS_BUCKET_NAME: props.imageAssets.bucketName,
                 },
@@ -75,7 +74,7 @@ export class LambdaHandlers extends Construct {
             {
                 code: new lambda.AssetCode('lambda/face_detect_represent'),
                 handler: 'main.handler',
-                runtime: lambda.Runtime.PYTHON_3_8,
+                runtime: lambda.Runtime.PYTHON_3_6,
                 environment: {
                     DYNAMODB_TABLE_NAME: props.facesTableName,
                     IMAGE_ASSETS_BUCKET_NAME: props.imageAssets.bucketName,
@@ -95,69 +94,35 @@ export class LambdaHandlers extends Construct {
          * Create Lambda Function: User Can Request the All Summary Info Based on Given Activity Id, it will
          * Query the DynamoDB Table to Return all Records
          */
-        // this.activitySummary = new lambda.Function(
-        //     this,
-        //     'activitySummary',
-        //     {
-        //         code: new lambda.AssetCode('lambda/activity_summary'),
-        //         handler: 'main.handler',
-        //         runtime: lambda.Runtime.PYTHON_3_8,
-        //         environment: {
-        //             DYNAMODB_TABLE_NAME: props.facesTableName,
-        //         },
-        //         role: faceRecognitionLambdaRole,
-        //         timeout: cdk.Duration.minutes(10),
-        //         memorySize: 512,
-        //     }
-        // );
-
-        this.activitySummary = new PythonFunction(
+        this.activitySummary = new lambda.Function(
             this,
             'activitySummary',
             {
-                entry: './lambda/activity_summary/',
-                index: 'main.py',
-                handler: 'handler',
-                runtime: lambda.Runtime.PYTHON_3_8,
+                code: lambda.Code.fromAsset('./lambda/activity_summary/activity_summary.zip'),
+                handler: 'main.handler',
+                runtime: lambda.Runtime.PYTHON_3_6,
                 environment: {
                     DYNAMODB_TABLE_NAME: props.facesTableName,
                 },
                 role: faceRecognitionLambdaRole,
                 timeout: cdk.Duration.minutes(10),
-                memorySize: 8196,
+                memorySize: 512,
             }
         );
+
 
         /**
          * Create Lambda Function: User also can query the dynamodb table based on a given image, it will invoke
          * the face detection and representation service (SageMaker Endpoint) and then compare the face embedding
          * vector with all faces in DynamoDB, finally return all associated iamges with face detection info
          */
-        // this.faceQuery = new lambda.Function(
-        //     this,
-        //     'faceQuery',
-        //     {
-        //         code: new lambda.AssetCode('lambda/face_query'),
-        //         handler: 'main.handler',
-        //         runtime: lambda.Runtime.PYTHON_3_8,
-        //         environment: {
-        //             SAGEMAKER_ENDPOINT_NAME: props.sagemakerInferenceEndpointName,
-        //             DYNAMODB_TABLE_NAME: props.facesTableName,
-        //         },
-        //         timeout: cdk.Duration.minutes(10),
-        //         role: faceRecognitionLambdaRole,
-        //         memorySize: 8196,
-        //     }
-        // );
-
-        this.faceQuery = new PythonFunction(
+        this.faceQuery = new lambda.Function(
             this,
             'faceQuery',
             {
-                entry: './lambda/face_query/',
-                index: 'main.py',
-                handler: 'handler',
-                runtime: lambda.Runtime.PYTHON_3_8,
+                code: lambda.Code.fromAsset('./lambda/face_query/face_query.zip'),
+                handler: 'main.handler',
+                runtime: lambda.Runtime.PYTHON_3_6,
                 environment: {
                     SAGEMAKER_ENDPOINT_NAME: props.sagemakerInferenceEndpointName,
                     DYNAMODB_TABLE_NAME: props.facesTableName,

@@ -3,8 +3,8 @@ import os
 import json
 import time
 import numpy as np
-from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
 from botocore import config
+from sklearn.metrics.pairwise import euclidean_distances, cosine_distances
 
 
 solution_identifier = {"user_agent_extra": "AwsSolution/SO8016/1.0.0"}
@@ -84,8 +84,9 @@ def handler(event, context):
     if len(anchor_faces) == 0:
         ret_body = "no face detected in query image"
     else:
-        anchor_face_representation = np.array(anchor_faces[0]["representation"])
+        anchor_face_representation = np.array(anchor_faces[0]['representation'])
         anchor_face_feats = np.expand_dims(anchor_face_representation, axis=0)
+        print('anchor_face_feats.shape = {}'.format(anchor_face_feats.shape))
 
         # -------------------------------------------------------------------------------------------- #
         # ------               Step 2: Query All Faces with Given Activity ID                 -------- #
@@ -101,24 +102,19 @@ def handler(event, context):
         if len(target_faces) == 0:
             ret_body = "faces library empty"
         else:
+            print('# of faces in library = {}'.format(len(target_faces)))
             target_face_feats = list()
             target_face_info = list()
             for _, face in enumerate(target_faces):
-                target_face_feats.append(face['representation'])
+                target_face_feats.append(json.loads(face['representation']['S']))
                 target_face_info.append(
                     {
-                        'activity_id': face['activity_id'],
-                        'image_id': face['image_id'],
-                        'face_id': face['face_id'],
-                        'bbox': face['bbox'],
-                        'confidence': face['confidence'],
-                        'landmarks': {
-                            "left_eye": face['left_eye'],
-                            "right_eye": face['right_eye'],
-                            "nose": face['nose'],
-                            "left_mouth": face['left_mouth'],
-                            "right_mouth": face['right_mouth']
-                        },
+                        'activity_id': face['activity_id']['S'],
+                        'image_id': face['image_id']['S'],
+                        'face_id': face['face_id']['S'],
+                        'bbox': json.loads(face['bbox']['S']),
+                        'confidence': float(face['confidence']['N']),
+                        'landmarks': json.loads(face['landmarks']['S'])
                     }
                 )
 
@@ -127,6 +123,7 @@ def handler(event, context):
 
             cosine_distance_list = cosine_distances(X=anchor_face_feats, Y=target_face_feats)
             cosine_distance_list = np.squeeze(cosine_distance_list)
+            print('cosine_distance_list = {}'.format(cosine_distance_list))
 
             # target_norm_vector = np.linalg.norm(target_face_feats, axis=-1)
             # target_norm_vector = np.expand_dims(target_norm_vector, axis=-1)
@@ -142,7 +139,9 @@ def handler(event, context):
 
             cluster = list()
             for index in indices:
-                cluster.append(target_face_info[index])
+                similar_face_obj = target_face_info[index]
+                similar_face_obj['distance'] = float(cosine_distance_list[index])
+                cluster.append(similar_face_obj)
 
             ret_body = json.dumps(cluster)
 
