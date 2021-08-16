@@ -1,8 +1,7 @@
-import {Construct, Stack} from "@aws-cdk/core";
+import {Construct} from "@aws-cdk/core";
 import * as cdk from "@aws-cdk/core";
 import * as iam from "@aws-cdk/aws-iam";
 import * as sagemaker from '@aws-cdk/aws-sagemaker';
-import {CfnEndpoint} from '@aws-cdk/aws-sagemaker';
 
 
 export interface SageMakerRuntimeEndpointProps {
@@ -14,7 +13,7 @@ export interface SageMakerRuntimeEndpointProps {
 
 
 export class SageMakerRuntimeEndpoint extends Construct {
-    public readonly faceRecgnitionEndpointName: string;
+    public readonly faceRecognitionEndpointName: string;
 
     constructor(scope: Construct, id: string, props: SageMakerRuntimeEndpointProps) {
         super(scope, id);
@@ -39,7 +38,7 @@ export class SageMakerRuntimeEndpoint extends Construct {
         /**
          * Create Runtime Inference Model/Model Configuration/Endpoint
          */
-        const imageUrl = `503146276818.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com.cn/ipc-ai-saas-face-recognition-gpu:latest`;
+        const imageUrl = `753680513547.dkr.ecr.${cdk.Aws.REGION}.amazonaws.com.cn/ipc-ai-saas-face-recognition-gpu:latest`;
         const faceRecognitionInferenceModel = new sagemaker.CfnModel(
             this,
             'faceRecognitionInferenceModel',
@@ -80,7 +79,7 @@ export class SageMakerRuntimeEndpoint extends Construct {
                 endpointConfigName: faceRecognitionInferenceEndpointConfig.attrEndpointConfigName
             }
         );
-        this.faceRecgnitionEndpointName = faceRecognitionInferenceEndpoint.attrEndpointName;
+        this.faceRecognitionEndpointName = faceRecognitionInferenceEndpoint.attrEndpointName;
 
 
     }
