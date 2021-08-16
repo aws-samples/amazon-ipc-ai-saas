@@ -117,7 +117,7 @@ export class IpcAiSaasStack extends cdk.Stack {
         {
             imageAssets: imageAssets,
             facesTableName: faces.tableName,
-            sagemakerInferenceEndpointName: sagemakerStack.faceRecgnitionEndpointName,
+            sagemakerInferenceEndpointName: sagemakerStack.faceRecognitionEndpointName,
         }
     );
 
