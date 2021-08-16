@@ -98,7 +98,18 @@ export class LambdaHandlers extends Construct {
             this,
             'activitySummary',
             {
-                code: lambda.Code.fromAsset('./lambda/activity_summary/activity_summary.zip'),
+                code: lambda.Code.fromAsset(
+                    './lambda/activity_summary/',
+                    {
+                        bundling: {
+                            image: lambda.Runtime.PYTHON_3_6.bundlingImage,
+                            command: [
+                                'bash', '-c',
+                                'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output'
+                            ]
+                        }
+                    }
+                ),
                 handler: 'main.handler',
                 runtime: lambda.Runtime.PYTHON_3_6,
                 environment: {
@@ -120,7 +131,18 @@ export class LambdaHandlers extends Construct {
             this,
             'faceQuery',
             {
-                code: lambda.Code.fromAsset('./lambda/face_query/face_query.zip'),
+                code: lambda.Code.fromAsset(
+                    './lambda/face_query/',
+                    {
+                        bundling: {
+                            image: lambda.Runtime.PYTHON_3_6.bundlingImage,
+                            command: [
+                                'bash', '-c',
+                                'pip install -r requirements.txt -t /asset-output && cp -au . /asset-output'
+                            ]
+                        }
+                    }
+                ),
                 handler: 'main.handler',
                 runtime: lambda.Runtime.PYTHON_3_6,
                 environment: {
