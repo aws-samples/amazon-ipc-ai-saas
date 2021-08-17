@@ -175,7 +175,7 @@ def transformation():
 
     # image decode
     t1 = time.time()
-    image_data = cv2.imdecode(np.frombuffer(base64.b64decode(image_base64_enc), np.uint8), cv2.IMREAD_COLOR)
+    image_data = cv2.imdecode(np.frombuffer(base64.b64decode(image_base64_enc), np.uint8), cv2.IMREAD_COLOR)    # BGR
     height, width, channels = image_data.shape
 
     # face detection, alignment and represent
