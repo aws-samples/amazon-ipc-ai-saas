@@ -58,6 +58,18 @@ export class IpcAiSaasStack extends cdk.Stack {
     });
 
 
+    const filterEyesDistanceThreshold = new cdk.CfnParameter(this, 'faceConfidenceThreshold', {
+        description: 'Please configure the threshold of frontal face (only faces with eyes distance / face width larger than this threshold will be further represented)',
+        type: 'String',
+        default: '0.15',
+        allowedValues: [
+            '0.15',
+            '0.20',
+            '0.25',
+        ]
+    });
+
+
     /**
      * S3 Bucket Provision
      */
@@ -103,7 +115,8 @@ export class IpcAiSaasStack extends cdk.Stack {
             deployInstanceType: deployInstanceType.valueAsString,
             faceDetectorModel: faceDetectorModel.valueAsString,
             faceRepresenterModel: faceRepresenterModel.valueAsString,
-            faceConfidenceThreshold: faceConfidenceThreshold.valueAsString
+            faceConfidenceThreshold: faceConfidenceThreshold.valueAsString,
+            filterEyesDistanceThreshold: filterEyesDistanceThreshold.valueAsString
         }
     );
 

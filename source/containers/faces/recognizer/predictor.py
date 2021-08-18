@@ -21,10 +21,12 @@ FACE_DETECTOR_MODEL = os.environ.get("FACE_DETECTOR_MODEL", "retinaface_mnet025_
 FACE_REPRESENT_MODEL = os.environ.get("FACE_REPRESENT_MODEL", "MobileFaceNet")
 
 FACE_CONFIDENCE_THRESHOLD = float(os.environ.get("FACE_CONFIDENCE_THRESHOLD", "0.70"))
+FILTER_EYES_DISTANCE_RATIO = float(os.environ.get("FILTER_EYES_DISTANCE_RATIO", "0.15"))
 
 print('FACE_DETECTOR_MODEL = {}'.format(FACE_DETECTOR_MODEL))
 print('FACE_REPRESENT_MODEL = {}'.format(FACE_REPRESENT_MODEL))
 print('FACE_CONFIDENCE_THRESHOLD = {}'.format(FACE_CONFIDENCE_THRESHOLD))
+print('FILTER_EYES_DISTANCE_RATIO = {}'.format(FILTER_EYES_DISTANCE_RATIO))
 
 
 # A singleton for holding the model. This simply loads the model and holds it.
@@ -117,6 +119,14 @@ class FaceRecognizerService(object):
                 continue
 
             pts5 = pts5_list[face_idx]
+
+            # ignore faces with eyes coordinates too close
+            eyes_distance = np.linalg.norm(
+                np.array([float(pts5[0][0]), float(pts5[0][1])]) -
+                np.array([float(pts5[1][0]), float(pts5[1][1])]))
+            face_width = np.abs(x_max - x_min)
+            if eyes_distance / float(face_width) < FILTER_EYES_DISTANCE_RATIO:
+                continue
 
             aligned_target_face = face_align.norm_crop(raw_input_image, pts5)
             embedding_vector = cls.get_feature(aligned_target_face)

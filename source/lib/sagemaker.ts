@@ -9,6 +9,7 @@ export interface SageMakerRuntimeEndpointProps {
     readonly faceDetectorModel: string,
     readonly faceRepresenterModel: string,
     readonly faceConfidenceThreshold: string,
+    readonly filterEyesDistanceThreshold: string,
 }
 
 
@@ -52,6 +53,7 @@ export class SageMakerRuntimeEndpoint extends Construct {
                             FACE_DETECTOR_MODEL: props.faceDetectorModel,
                             FACE_REPRESENT_MODEL: props.faceRepresenterModel,
                             FACE_CONFIDENCE_THRESHOLD: props.faceConfidenceThreshold,
+                            FILTER_EYES_DISTANCE_RATIO: props.filterEyesDistanceThreshold,
                         }
                     }
                 ],

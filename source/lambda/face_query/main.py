@@ -14,11 +14,10 @@ sagemaker_runtime_client = boto3.client('runtime.sagemaker', config=config)
 dynamodb = boto3.client('dynamodb', config=config)
 
 
-# DO NOT MODIFY
-FACE_RECOGNITION_THRESHOLD = {
-    'cosine': 0.68,
-    'euclidean_l2': 1.13
-}
+# FACE_RECOGNITION_THRESHOLD = {
+#     'cosine': 0.68,
+#     'euclidean_l2': 1.13
+# }
 
 
 def query_all_faces_in_dynamodb(dynamodb_table_name, activity_id):
@@ -65,6 +64,7 @@ def handler(event, context):
     request = json.loads(event['body'])
     activity_id = request.get('activity_id', None)
     image_base64_enc = request.get('image_base64_enc', None)
+    distance_threshold = float(request.get('distance_threshold', 0.68))
 
     # -------------------------------------------------------------------------------------------- #
     # ------                 Step 1: Faces Detection & Representation                     -------- #
@@ -135,7 +135,7 @@ def handler(event, context):
             # euclidean_distance_list = euclidean_distances(X=anchor_face_feats_norm, Y=target_face_feats_norm)
             # euclidean_distance_list = np.squeeze(euclidean_distance_list)
 
-            indices = np.where(cosine_distance_list < FACE_RECOGNITION_THRESHOLD['cosine'])[0]
+            indices = np.where(cosine_distance_list < distance_threshold)[0]
 
             cluster = list()
             for index in indices:

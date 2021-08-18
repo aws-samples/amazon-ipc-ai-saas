@@ -15,11 +15,10 @@ config = config.Config(**solution_identifier)
 dynamodb = boto3.client('dynamodb', config=config)
 
 
-# DO NOT MODIFY
-FACE_RECOGNITION_THRESHOLD = {
-    'cosine': 0.68,
-    'euclidean_l2': 1.13
-}
+# FACE_RECOGNITION_THRESHOLD = {
+#     'cosine': 0.68,
+#     'euclidean_l2': 1.13
+# }
 
 
 def query_all_faces_in_dynamodb(dynamodb_table_name, activity_id):
@@ -64,7 +63,9 @@ def handler(event, context):
 
     request = json.loads(event['body'])
     activity_id = request.get('activity_id', None)
+    distance_threshold = float(request.get('distance_threshold', 0.68))
     print('activity_id = {}'.format(activity_id))
+    print('distance_threshold = {}'.format(distance_threshold))
 
     # --------------------------------------------------------------------------------- #
     # ------             Query All Faces with Given Activity ID                -------- #
@@ -101,7 +102,7 @@ def handler(event, context):
         print('face_feats.shape = {}'.format(face_feats.shape))
 
         # clustering based on cosine distance
-        cosine_cluster = DBSCAN(metric='cosine', eps=FACE_RECOGNITION_THRESHOLD['cosine'], min_samples=1)
+        cosine_cluster = DBSCAN(metric='cosine', eps=distance_threshold, min_samples=1)
         cosine_cluster_labels = cosine_cluster.fit_predict(face_feats)
         print('cosine_cluster_labels = {}'.format(cosine_cluster_labels))
         print('len(list(set(cosine_cluster_labels))) = {}'.format(len(list(set(cosine_cluster_labels)))))
@@ -112,7 +113,7 @@ def handler(event, context):
         # norm_vector = np.linalg.norm(face_feats, axis=-1)
         # norm_vector = np.expand_dims(norm_vector, axis=-1)
         # faces_feats_norm = face_feats / norm_vector
-        # euclidean_cluster = DBSCAN(metric='euclidean', eps=FACE_RECOGNITION_THRESHOLD['euclidean_l2'], min_samples=1)
+        # euclidean_cluster = DBSCAN(metric='euclidean', eps=distance_threshold, min_samples=1)
         # euclidean_cluster_labels = euclidean_cluster.fit_predict(faces_feats_norm)
 
         faces_cluster = dict()
