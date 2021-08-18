@@ -58,7 +58,7 @@ export class IpcAiSaasStack extends cdk.Stack {
     });
 
 
-    const filterEyesDistanceThreshold = new cdk.CfnParameter(this, 'faceConfidenceThreshold', {
+    const filterEyesDistanceThreshold = new cdk.CfnParameter(this, 'filterEyesDistanceThreshold', {
         description: 'Please configure the threshold of frontal face (only faces with eyes distance / face width larger than this threshold will be further represented)',
         type: 'String',
         default: '0.15',
