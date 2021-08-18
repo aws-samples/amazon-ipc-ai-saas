@@ -36,7 +36,7 @@ class ImageUploaderDemo(object):
 
 if __name__ == '__main__':
     demo = ImageUploaderDemo(
-        uploader_url="https://8bfha86lq8.execute-api.cn-northwest-1.amazonaws.com.cn/prod/upload",
+        uploader_url="https://your_api_gateway_endpoint_url/upload",
         test_image_full_path="./test_imgs/face.jpeg"
     )
     demo.run()

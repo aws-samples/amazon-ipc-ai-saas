@@ -15,6 +15,7 @@ class ActivitySummaryDemo(object):
     def run(self):
         request_body = {
             "activity_id": self._activity_id,
+            "distance_threshold": 0.52
         }
 
         response = requests.post(self._request_url, data=json.dumps(request_body))
@@ -23,7 +24,7 @@ class ActivitySummaryDemo(object):
 
 if __name__ == '__main__':
     demo = ActivitySummaryDemo(
-        request_url="https://8bfha86lq8.execute-api.cn-northwest-1.amazonaws.com.cn/prod/activity",
+        request_url="https://your_api_gateway_endpoint_url/activity",
         activity_id="Activity_2021_08_29_BJ001"
     )
     demo.run()
