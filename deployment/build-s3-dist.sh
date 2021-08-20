@@ -18,7 +18,7 @@ CDK_OUT_PATH="${__dir}/cdk.out"
 
 if [ -z "$1" ] || [ -z "$2" ]; then
     echo "Parameters not enough"
-    echo "Example: $(basename $0) <BUCKET_NAME> <SOLUTION_NAME> [VERSION]"  # for example: ./build-s3-dist.sh sh-solutions-cn ip-camera-ai-saas-face-rec v1.1.0
+    echo "Example: $(basename $0) <BUCKET_NAME> <SOLUTION_NAME> [VERSION]"  # for example: ./build-s3-dist.sh sh-solutions-cn ip-camera-ai-saas-face-rec v1.0.0
     exit 1
 fi
 

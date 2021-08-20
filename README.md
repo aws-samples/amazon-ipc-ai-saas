@@ -81,9 +81,9 @@
 的解决方案控制台标签页`outputs`中)。
 
 三个用户交互的测试Python程序如下所示：
-1. 用户上传图片：[simulate_image_uploader.py](./source/simulate/simulate_image_uploader.py)
-2. 用户查询数据库中人脸聚类：[simulate_activity_summary.py](./source/simulate/simulate_activity_summary.py)
-3. 用户在数据库中搜索某一个指定的人脸：[simulate_face_query.py](./source/simulate/simulate_face_query.py)
+1. 用户上传图片：[simulate_image_uploader.py](./source/simulate/lambda/simulate_image_uploader.py)
+2. 用户查询数据库中人脸聚类：[simulate_activity_summary.py](./source/simulate/lambda/simulate_activity_summary.py)
+3. 用户在数据库中搜索某一个指定的人脸：[simulate_face_query.py](./source/simulate/lambda/simulate_face_query.py)
 
 
 ## 安全
